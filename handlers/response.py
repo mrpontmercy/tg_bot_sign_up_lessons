@@ -14,7 +14,7 @@ async def send_template_message(
     data: dict | None = None,
     replace: bool = True,
 ):
-    await context.bot.send_message(
+    return await context.bot.send_message(
         tg_id,
         render_template(template_name, data=data, replace=replace),
         reply_markup=keyboard,

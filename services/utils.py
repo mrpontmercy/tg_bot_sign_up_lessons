@@ -1,8 +1,14 @@
 from dataclasses import dataclass, field
 from functools import wraps
+import os
 import re
 from typing import Any
+import uuid
 
+from telegram import Document
+from telegram.ext import ContextTypes
+
+from config import LESSONS_DIR
 from services.exceptions import ColumnCSVError
 
 
@@ -141,6 +147,7 @@ def add_start_over(func):
     return wrapper
 
 
+# Позволяет удалять предыдущее сообщение. Работает вместе с callback_query
 def add_message_info_into_context(func):
     @wraps(func)
     async def wrapper(update, context):
@@ -153,7 +160,34 @@ def add_message_info_into_context(func):
     return wrapper
 
 
+def add_message_info_into_context_func(user_data: dict, chat_id, message_id):
+    user_data["delete_message_info"] = (
+        chat_id,
+        message_id,
+    )
+
+
 async def delete_last_message_from_context(context):
     del_info = context.user_data.get("delete_message_info")
     if del_info:
         await context.bot.delete_message(del_info[0], del_info[1])
+        del context.user_data["delete_message_info"]
+
+
+async def get_saved_lessonfile_path(
+    recived_file: Document, context: ContextTypes.DEFAULT_TYPE
+):
+    file = await context.bot.get_file(recived_file)
+    new_file_name = str(uuid.uuid4()) + "." + recived_file.file_name.split(".")[-1]
+    if not LESSONS_DIR.exists():
+        os.mkdir(LESSONS_DIR)
+    saved_file_path = LESSONS_DIR / new_file_name
+    await file.download_to_drive(saved_file_path)
+    return saved_file_path
+
+
+def make_lesson_params(lesson: TransientLesson, lecuturer_id: int):
+    param = lesson.to_dict()
+    del param["lecturer_phone"]
+    param["lecturer_id"] = lecuturer_id
+    return param

@@ -1,4 +1,5 @@
 from typing import Any, Iterable
+from config import LECTURER_STATUS
 from db import execute, fetch_all, fetch_one
 from services.exceptions import LessonError, UserError
 from services.utils import Lesson, Subscription, UserID
@@ -139,3 +140,26 @@ async def get_all_users_of_lesson(params_lesson_id: dict):
     )
 
     return all_students_of_lesson
+
+
+async def update_user_to_lecturer(user_id):
+    await execute_update(
+        "user",
+        "status=:status",
+        "id=:user_id",
+        {
+            "status": LECTURER_STATUS,
+            "user_id": user_id,
+        },
+    )
+
+
+async def get_all_lessons_from_db() -> list[Lesson]:
+    sql = """select l.id, l.title, l.time_start, l.num_of_seats, u.f_name || ' ' || u.s_name as lecturer_full_name, l.lecturer_id from lesson l
+            join user u on u.id=l.lecturer_id"""
+    rows = await fetch_all(sql)
+
+    if not rows:
+        raise LessonError("Не удалось найти занятия")
+
+    return [Lesson(**row) for row in rows]

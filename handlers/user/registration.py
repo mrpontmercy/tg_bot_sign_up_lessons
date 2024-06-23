@@ -6,8 +6,8 @@ from telegram.ext import ContextTypes
 from handlers.response import edit_callbackquery_template, send_template_message
 from handlers.start import get_current_keyboard
 from services.exceptions import ValidationError
-from services.kb import get_back_kb, get_retry_or_back_keyboard
-from services.registration.registration import insert_user, validate_message
+from services.kb import get_back_keyboard, get_retry_or_back_keyboard
+from services.user.registration import insert_user, validate_message
 from services.states import END, InterimStartState, StartState
 from services.utils import (
     add_message_info_into_context,
@@ -21,19 +21,18 @@ from services.utils import (
 async def start_registration(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-    back_kb = get_back_kb(InterimStartState.BACK_TO_START)
+    back_kb = get_back_keyboard(InterimStartState.BACK_TO_START)
     await edit_callbackquery_template(query, "registration.jinja", keyboard=back_kb)
     return StartState.REGISTRATION
 
 
 @add_start_over
 async def user_registration(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
     await delete_last_message_from_context(context)
     user = update.effective_user
     full_info = [user.id, user.username] + update.effective_message.text.split(" ")
     retry_kb = get_retry_or_back_keyboard(InterimStartState.START_REGISTER, END)
-    back_kb = get_back_kb(InterimStartState.BACK_TO_START)
+    back_kb = get_back_keyboard(InterimStartState.BACK_TO_START)
     try:
         validated_message: User = validate_message(full_info)
     except ValidationError as e:
@@ -54,7 +53,6 @@ async def user_registration(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_markup=back_kb,
         )
         return StartState.SHOWING
-    kb = await get_current_keyboard(update)
     await update.effective_message.reply_text(
         "Вы успешно зарегестрировались!", reply_markup=back_kb
     )

@@ -1,7 +1,7 @@
 from sqlite3 import Error
 from db import get_db
 from services.db import execute_delete, execute_update, fetch_one_subscription_where_cond
-from services.exceptions import InputMessageError, InvalidSubKey
+from services.exceptions import InputMessageError, InvalidSubKey, SubscriptionError
 from services.utils import Subscription, UserID
 
 
@@ -78,3 +78,18 @@ async def _get_sub_from_key(sub_key: str):
         )
 
     return curr_key_sub
+
+
+async def get_user_subscription(user_db_id: int):
+    subsciption_by_user = await fetch_one_subscription_where_cond(
+        "user_id=:user_id",
+        {"user_id": user_db_id},
+    )
+    if subsciption_by_user is None:
+        raise SubscriptionError("У пользователя нет абонимента")
+    elif subsciption_by_user.num_of_classes == 0:
+        raise SubscriptionError(
+            "В вашем абонименте не осталось занятий. Обратитесь за новым абониментом!"
+        )
+
+    return subsciption_by_user

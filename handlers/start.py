@@ -6,7 +6,7 @@ from services.exceptions import UserError
 from services.kb import get_non_register_keyboard, get_registred_keyboard
 from services.states import END, StartState
 from services.templates import render_template
-from services.utils import add_start_over
+from services.utils import add_start_over, delete_last_message_from_context
 
 
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -23,6 +23,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await context.bot.send_message(
                 update.effective_user.id, always_display_text, reply_markup=start_kb
             )
+        del context.user_data["START_OVER"]
     else:
         await update.message.reply_text(
             render_template("start.jinja") + always_display_text, reply_markup=start_kb
@@ -49,6 +50,7 @@ async def get_current_keyboard(update: Update):
 
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """End Conversation by command."""
+    context.user_data.clear()
     await update.message.reply_text("Все завершено!")
 
     return END
