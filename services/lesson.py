@@ -5,9 +5,9 @@ from typing import Callable
 
 from telegram import Update
 from telegram.ext import ContextTypes
-from db import execute
+from db import execute, fetch_all
 from handlers.response import edit_callbackquery_template
-from services.exceptions import ColumnCSVError
+from services.exceptions import ColumnCSVError, LessonError
 from services.templates import render_template
 from services.utils import Lesson, TransientLesson
 
@@ -65,3 +65,14 @@ async def insert_lesson_in_db(params):
         """INSERT INTO lesson (title, time_start, num_of_seats, lecturer_id) VALUES (:title, :time_start,:num_of_seats, :lecturer_id)""",
         params,
     )
+
+
+async def get_all_lessons_from_db(*args) -> list[Lesson]:
+    sql = """select l.id, l.title, l.time_start, l.num_of_seats, u.f_name || ' ' || u.s_name as lecturer_full_name, l.lecturer_id from lesson l
+            join user u on u.id=l.lecturer_id"""
+    rows = await fetch_all(sql)
+
+    if not rows:
+        raise LessonError("Не удалось найти занятия")
+
+    return [Lesson(**row) for row in rows]

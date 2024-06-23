@@ -2,7 +2,9 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from config import (
     CALLBACK_DATA_CANCEL_LESSON,
+    CALLBACK_DATA_DELETELESSON_ADMIN,
     CALLBACK_DATA_DELETESUBSCRIPTION,
+    CALLBACK_DATA_EDIT_LESSON,
     CALLBACK_DATA_SUBSCRIBE_TO_LESSON,
 )
 from services.states import END, AdminState, InterimAdminState, InterimStartState
@@ -110,6 +112,26 @@ def get_retry_or_back_keyboard(retry_state, end_state):
         ]
     )
     return buttons
+
+
+def get_flip_edit_delete_back_keyboard(
+    current_index, number_of_items, prefix, back_button_callback: str
+):
+    keyboard = _get_flip_buttons(current_index, number_of_items, prefix)
+    keyboard.append(
+        [
+            InlineKeyboardButton(
+                "Изменить", callback_data=f"{prefix}{CALLBACK_DATA_EDIT_LESSON}"
+            ),
+            InlineKeyboardButton(
+                "Удалить", callback_data=f"{prefix}{CALLBACK_DATA_DELETELESSON_ADMIN}"
+            ),
+        ]
+    )
+    keyboard.append(
+        [InlineKeyboardButton(text="Назад", callback_data=back_button_callback)]
+    )
+    return InlineKeyboardMarkup(keyboard)
 
 
 def get_flip_delete_back_keyboard(

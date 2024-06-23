@@ -8,6 +8,7 @@ from telegram.ext import (
 
 from config import (
     CALLBACK_DATA_CANCEL_LESSON,
+    CALLBACK_DATA_DELETELESSON_ADMIN,
     CALLBACK_DATA_DELETESUBSCRIPTION,
     CALLBACK_DATA_SUBSCRIBE_TO_LESSON,
     CALLBACK_LESSON_PREFIX,
@@ -18,6 +19,7 @@ from handlers.admin.admin import (
     admin_command,
     return_to_admin,
 )
+from handlers.admin.list_lessons import all_lessons_button_admin, show_all_lessons_admin
 from handlers.admin.list_subscription import (
     list_available_subs_admin,
     list_subs_button_admin,
@@ -53,7 +55,7 @@ from services.states import (
 
 CQH_CONFIRM_SUBSCRIBE = CallbackQueryHandler(
     confirmation_action_handler,
-    pattern=f".*({CALLBACK_DATA_DELETESUBSCRIPTION}|{CALLBACK_DATA_SUBSCRIBE_TO_LESSON}|{CALLBACK_DATA_CANCEL_LESSON})$",
+    pattern=f".*({CALLBACK_DATA_DELETESUBSCRIPTION}|{CALLBACK_DATA_SUBSCRIBE_TO_LESSON}|{CALLBACK_DATA_CANCEL_LESSON}|{CALLBACK_DATA_DELETELESSON_ADMIN})$",
 )
 
 CQH_CONFIRM_SUBCRIBE_YES = CallbackQueryHandler(
@@ -122,17 +124,6 @@ START_CHOOSE_ACTION_HANDLERS = [
     SCHEDULE_LESSONS_CONV_HANDLER_USER,
 ]
 
-# START_SHOWING_HANLERS = [
-#     CallbackQueryHandler(back_to_start, pattern=f"{END}"),
-#     CallbackQueryHandler(
-#         start_registration, pattern=f"^{InterimStartState.START_REGISTER}$"
-#     ),
-#     CallbackQueryHandler(
-#         start_activating_subkey,
-#         pattern=f"^{InterimStartState.START_ACTIVATE_SUBSCRIPTION}$",
-#     ),
-# ]
-
 START_CONV_HANLER = ConversationHandler(
     [CommandHandler("start", start_command)],
     states={
@@ -181,6 +172,28 @@ LIST_SUBS_CONV_HANDLER = ConversationHandler(
     allow_reentry=True,
 )
 
+LIST_ALL_LESSONS_CONV_HANDLER_ADMIN = ConversationHandler(
+    [
+        CallbackQueryHandler(
+            show_all_lessons_admin, pattern=f"^{InterimAdminState.SHOW_ALL_LESSONS}$"
+        )
+    ],
+    states={
+        SwitchState.SWITCHING: [
+            CallbackQueryHandler(
+                all_lessons_button_admin, pattern="^" + CALLBACK_LESSON_PREFIX + "\d+"
+            )
+        ]
+    },
+    fallbacks=[
+        CallbackQueryHandler(
+            return_to_admin, pattern=f"^{SwitchState.RETURN_PREV_CONV}$"
+        )
+    ],
+    map_to_parent={END: AdminState.CHOOSE_ACTION},
+    allow_reentry=True,
+)
+
 
 ADMIN_CHOOSE_ACTION_HANDLERS = [
     CallbackQueryHandler(
@@ -195,6 +208,7 @@ ADMIN_CHOOSE_ACTION_HANDLERS = [
         start_inserting_lessons, pattern=f"^{InterimAdminState.START_UPDATE_LESSONS}$"
     ),
     LIST_SUBS_CONV_HANDLER,
+    LIST_ALL_LESSONS_CONV_HANDLER_ADMIN,
 ]
 
 

@@ -19,6 +19,7 @@ class InterimAdminState(Enum):
     LIST_AVAILABLE_SUBS = auto()
     START_UPDATE_LESSONS = auto()
     SHOW_ALL_LESSONS = auto()
+    EDIT_LESSON = auto()
     ENTER_LECTURER_PHONE = auto()
     BACK_TO_ADMIN = auto()
 

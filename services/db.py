@@ -152,14 +152,3 @@ async def update_user_to_lecturer(user_id):
             "user_id": user_id,
         },
     )
-
-
-async def get_all_lessons_from_db() -> list[Lesson]:
-    sql = """select l.id, l.title, l.time_start, l.num_of_seats, u.f_name || ' ' || u.s_name as lecturer_full_name, l.lecturer_id from lesson l
-            join user u on u.id=l.lecturer_id"""
-    rows = await fetch_all(sql)
-
-    if not rows:
-        raise LessonError("Не удалось найти занятия")
-
-    return [Lesson(**row) for row in rows]

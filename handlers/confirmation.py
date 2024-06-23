@@ -5,9 +5,11 @@ from telegram.ext import ContextTypes
 
 from config import (
     CALLBACK_DATA_CANCEL_LESSON,
+    CALLBACK_DATA_DELETELESSON_ADMIN,
     CALLBACK_DATA_DELETESUBSCRIPTION,
     CALLBACK_DATA_SUBSCRIBE_TO_LESSON,
 )
+from handlers.admin.list_lessons import delete_lesson_admin, show_all_lessons_admin
 from handlers.admin.list_subscription import (
     list_available_subs_admin,
     remove_subscription,
@@ -48,6 +50,8 @@ async def confirm_action_button(update: Update, context: ContextTypes.DEFAULT_TY
         return await subscribe_to_lesson(update, context)
     elif action == CALLBACK_DATA_CANCEL_LESSON:
         return await cancel_lesson(update, context)
+    elif action == CALLBACK_DATA_DELETELESSON_ADMIN:
+        return await delete_lesson_admin(update, context)
 
     # if action == CALLBACK_DATA_SUBSCRIBE:
     #     await subscribe_to_lesson(update, context)
@@ -70,3 +74,5 @@ async def cancel_action_button(update: Update, context: ContextTypes.DEFAULT_TYP
         await show_available_lessons(update, context)
     elif action == CALLBACK_DATA_CANCEL_LESSON:
         await show_schedule_lessons(update, context)
+    elif action == CALLBACK_DATA_DELETELESSON_ADMIN:
+        await show_all_lessons_admin(update, context)
