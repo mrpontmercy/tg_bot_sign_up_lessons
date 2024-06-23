@@ -43,7 +43,7 @@ async def show_schedule_lessons(update: Update, context: ContextTypes.DEFAULT_TY
         await edit_callbackquery_template(
             query, "error.jinja", err=str(e), keyboard=back_kb
         )
-        return SwitchState.SWITCHING
+        return SwitchState.CHOOSE_ACTION
 
     first_lesson: Lesson = lessons_by_user[0]
     context.user_data["curr_lesson"] = first_lesson
@@ -59,7 +59,7 @@ async def show_schedule_lessons(update: Update, context: ContextTypes.DEFAULT_TY
         data=first_lesson.to_dict_lesson_info(),
         keyboard=kb,
     )
-    return SwitchState.SWITCHING
+    return SwitchState.CHOOSE_ACTION
 
 
 @add_start_over
@@ -81,7 +81,7 @@ async def schedule_lessons_button(update: Update, context: ContextTypes.DEFAULT_
         update=update,
         context=context,
     )
-    return SwitchState.SWITCHING
+    return SwitchState.CHOOSE_ACTION
 
 
 async def cancel_lesson(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -106,14 +106,14 @@ async def cancel_lesson(update: Update, context: ContextTypes.DEFAULT_TYPE):
             err="Не удалось удалить урок, попробуйте снова!",
             keyboard=back_kb,
         )
-        return SwitchState.SWITCHING
+        return SwitchState.CHOOSE_ACTION
 
     if not is_possible_dt(lesson.time_start):
         await update.callback_query.edit_message_text(
             "До занятия осталось меньше 2х часов. Отменить занятие не получится!",
             reply_markup=back_to_lesson_kb,
         )
-        return SwitchState.SWITCHING
+        return SwitchState.CHOOSE_ACTION
 
     user = await get_user_by_tg_id(user_tg_id)
     try:
@@ -122,7 +122,7 @@ async def cancel_lesson(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await edit_callbackquery_template(
             query, "error.jinja", err=str(e), keyboard=back_kb
         )
-        return SwitchState.SWITCHING
+        return SwitchState.CHOOSE_ACTION
     except sqlite3.Error as e:
         logging.getLogger(__name__).exception(e)
         await edit_callbackquery_template(
@@ -131,7 +131,7 @@ async def cancel_lesson(update: Update, context: ContextTypes.DEFAULT_TYPE):
             err="Что-то пошло не так, не удалось записаться на занятие.\nОбратитесь к администратору!",
             keyboard=back_kb,
         )
-        return SwitchState.SWITCHING
+        return SwitchState.CHOOSE_ACTION
 
     lecturer_id = lesson.lecturer_id
     # await notify_lecturer_user_cancel_lesson(
@@ -140,4 +140,4 @@ async def cancel_lesson(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.callback_query.edit_message_text(
         "Занятие успешно отменено!", reply_markup=back_kb
     )
-    return SwitchState.SWITCHING
+    return SwitchState.CHOOSE_ACTION

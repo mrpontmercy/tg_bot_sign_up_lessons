@@ -53,7 +53,7 @@ async def show_available_lessons(update: Update, context: ContextTypes.DEFAULT_T
         keyboard=kb,
     )
 
-    return SwitchState.SWITCHING
+    return SwitchState.CHOOSE_ACTION
 
 
 @add_start_over
@@ -69,7 +69,7 @@ async def available_lessons_button(update: Update, context: ContextTypes.DEFAULT
             err=err_str,
             keyboard=get_back_keyboard(str(SwitchState.RETURN_PREV_CONV)),
         )
-        return SwitchState.SWITCHING
+        return SwitchState.CHOOSE_ACTION
 
     kb_func = get_flip_signup_back_keyboard
     await _lessons_button(
@@ -80,7 +80,7 @@ async def available_lessons_button(update: Update, context: ContextTypes.DEFAULT
         update,
         context,
     )
-    return SwitchState.SWITCHING
+    return SwitchState.CHOOSE_ACTION
 
 
 async def subscribe_to_lesson(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -104,23 +104,23 @@ async def subscribe_to_lesson(update: Update, context: ContextTypes.DEFAULT_TYPE
             await edit_callbackquery_template(
                 query, "error.jinja", err="Что-то пошло не так!", keyboard=back_kb
             )
-            return SwitchState.SWITCHING
+            return SwitchState.CHOOSE_ACTION
     except (UserError, SubscriptionError, LessonError) as err:
         await edit_callbackquery_template(
             query, "error.jinja", err=str(err), keyboard=back_kb
         )
-        return SwitchState.SWITCHING
+        return SwitchState.CHOOSE_ACTION
     except sqlite3.Error as e:
         logging.getLogger(__name__).exception(e)
         await query.edit_message_text(
             "Что-то пошло не так, не удалось записаться на занятие.\nОбратитесь к администратору!",
             reply_markup=back_kb,
         )
-        return SwitchState.SWITCHING
+        return SwitchState.CHOOSE_ACTION
 
     del context.user_data["curr_lesson"]
     await query.edit_message_text(
         "Вы успешно записались на занятие!", reply_markup=back_kb
     )
 
-    return SwitchState.SWITCHING
+    return SwitchState.CHOOSE_ACTION

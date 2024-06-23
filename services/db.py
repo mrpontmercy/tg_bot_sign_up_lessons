@@ -130,7 +130,8 @@ async def insert_lessons_into_db(params: list[Iterable[Any]]):
         )
 
 
-async def get_all_users_of_lesson(params_lesson_id: dict):
+async def get_all_users_of_lesson(lesson_id: int):
+    params_lesson_id = {"lesson_id": lesson_id}
     user_ids = await fetch_all(
         "SELECT user_id from user_lesson where lesson_id=:lesson_id", params_lesson_id
     )

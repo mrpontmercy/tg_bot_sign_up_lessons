@@ -21,7 +21,7 @@ async def list_available_subs_admin(update: Update, context: ContextTypes.DEFAUL
         await edit_callbackquery_template(
             query, "error.jinja", err=str(e), keyboard=back_kb
         )
-        return SwitchState.SWITCHING
+        return SwitchState.CHOOSE_ACTION
 
     switch_kb = get_flip_delete_back_keyboard(
         0, len(subs), CALLBACK_SUB_PREFIX, str(SwitchState.RETURN_PREV_CONV)
@@ -35,7 +35,7 @@ async def list_available_subs_admin(update: Update, context: ContextTypes.DEFAUL
         data={"sub_key": sub.sub_key, "num_of_classes": sub.num_of_classes},
         keyboard=switch_kb,
     )
-    return SwitchState.SWITCHING
+    return SwitchState.CHOOSE_ACTION
 
 
 async def list_subs_button_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -49,7 +49,7 @@ async def list_subs_button_admin(update: Update, context: ContextTypes.DEFAULT_T
         await edit_callbackquery_template(
             query, "error.jinja", err=str(e), keyboard=back_kb
         )
-        return SwitchState.SWITCHING
+        return SwitchState.CHOOSE_ACTION
     current_index = int(query.data[len(CALLBACK_SUB_PREFIX) :])
     sub = subs[current_index]
     context.user_data["sub_id"] = sub.id
@@ -63,7 +63,7 @@ async def list_subs_button_admin(update: Update, context: ContextTypes.DEFAULT_T
         data={"sub_key": sub.sub_key, "num_of_classes": sub.num_of_classes},
         keyboard=switch_kb,
     )
-    return SwitchState.SWITCHING
+    return SwitchState.CHOOSE_ACTION
 
 
 async def remove_subscription(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -75,7 +75,7 @@ async def remove_subscription(update: Update, context: ContextTypes.DEFAULT_TYPE
         await edit_callbackquery_template(
             query, "error.jinja", err="Не удалось найти подписку!", keyboard=back_kb
         )
-        return SwitchState.SWITCHING
+        return SwitchState.CHOOSE_ACTION
 
     try:
         await delete_subscription(sub_id)
@@ -86,8 +86,8 @@ async def remove_subscription(update: Update, context: ContextTypes.DEFAULT_TYPE
             err="Не удалось удалить подписку! Обратитесь к администратору",
             keyboard=back_kb,
         )
-        return SwitchState.SWITCHING
+        return SwitchState.CHOOSE_ACTION
 
     back_kb = get_back_keyboard(InterimAdminState.LIST_AVAILABLE_SUBS)
     await query.edit_message_text("Абонемент удален!", reply_markup=back_kb)
-    return SwitchState.SWITCHING
+    return SwitchState.CHOOSE_ACTION

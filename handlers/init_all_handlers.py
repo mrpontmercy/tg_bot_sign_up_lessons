@@ -19,7 +19,20 @@ from handlers.admin.admin import (
     admin_command,
     return_to_admin,
 )
-from handlers.admin.list_lessons import all_lessons_button_admin, show_all_lessons_admin
+from handlers.admin.edit_lesson import (
+    edit_num_of_seats_lesson,
+    edit_time_start_lesson,
+    edit_title_lesson,
+    start_edit_lesson,
+    start_edit_num_of_seats_lesson,
+    start_edit_time_start_lesson,
+    start_edit_title_lesson,
+)
+from handlers.admin.list_lessons import (
+    all_lessons_button_admin,
+    return_to_lessons_admin,
+    show_all_lessons_admin,
+)
 from handlers.admin.list_subscription import (
     list_available_subs_admin,
     list_subs_button_admin,
@@ -47,7 +60,9 @@ from handlers.user.subscription import (
 from services.states import (
     END,
     AdminState,
+    EditLesson,
     InterimAdminState,
+    InterimEditLesson,
     InterimStartState,
     StartState,
     SwitchState,
@@ -74,7 +89,7 @@ AVAILABLE_LESSONS_CONV_HANDLER_USER = ConversationHandler(
         )
     ],
     states={
-        SwitchState.SWITCHING: [
+        SwitchState.CHOOSE_ACTION: [
             CallbackQueryHandler(
                 available_lessons_button, pattern="^" + CALLBACK_LESSON_PREFIX + "\d+"
             )
@@ -94,7 +109,7 @@ SCHEDULE_LESSONS_CONV_HANDLER_USER = ConversationHandler(
         )
     ],
     states={
-        SwitchState.SWITCHING: [
+        SwitchState.CHOOSE_ACTION: [
             CallbackQueryHandler(
                 schedule_lessons_button,
                 pattern="^" + CALLBACK_USER_LESSON_PREFIX + "\d+",
@@ -157,7 +172,7 @@ LIST_SUBS_CONV_HANDLER = ConversationHandler(
         )
     ],
     states={
-        SwitchState.SWITCHING: [
+        SwitchState.CHOOSE_ACTION: [
             CallbackQueryHandler(
                 list_subs_button_admin, pattern="^" + CALLBACK_SUB_PREFIX + "\d+"
             )
@@ -172,6 +187,48 @@ LIST_SUBS_CONV_HANDLER = ConversationHandler(
     allow_reentry=True,
 )
 
+
+EDIT_LESSON_CHOOSE_ACTION_HANDLERS = [
+    CallbackQueryHandler(
+        start_edit_title_lesson, pattern=f"^{InterimEditLesson.START_EDIT_TITLE}$"
+    ),
+    CallbackQueryHandler(
+        start_edit_time_start_lesson,
+        pattern=f"^{InterimEditLesson.START_EDIT_TIMESTART}$",
+    ),
+    CallbackQueryHandler(
+        start_edit_num_of_seats_lesson,
+        pattern=f"^{InterimEditLesson.START_EDIT_NUM_OF_SEATS}$",
+    ),
+]
+
+EDIT_LESSON_CONV_HANDLER_ADMIN = ConversationHandler(
+    [
+        CallbackQueryHandler(
+            start_edit_lesson, pattern=f"^{InterimEditLesson.START_EDIT_LESSON}$"
+        )
+    ],
+    states={
+        EditLesson.CHOOSE_ACTION: EDIT_LESSON_CHOOSE_ACTION_HANDLERS,
+        EditLesson.EDIT_TITLE: [
+            MessageHandler(filters.TEXT & ~filters.COMMAND, edit_title_lesson)
+        ],
+        EditLesson.EDIT_TIMESTART: [
+            MessageHandler(filters.TEXT & ~filters.COMMAND, edit_time_start_lesson)
+        ],
+        EditLesson.EDIT_NUM_OF_SEATS: [
+            MessageHandler(filters.TEXT & ~filters.COMMAND, edit_num_of_seats_lesson)
+        ],
+    },
+    fallbacks=[
+        CallbackQueryHandler(
+            return_to_lessons_admin, pattern=f"^{EditLesson.RETURN_PREV_CONV}$"
+        )
+    ],
+    map_to_parent={END: SwitchState.CHOOSE_ACTION},
+    allow_reentry=True,
+)
+
 LIST_ALL_LESSONS_CONV_HANDLER_ADMIN = ConversationHandler(
     [
         CallbackQueryHandler(
@@ -179,10 +236,11 @@ LIST_ALL_LESSONS_CONV_HANDLER_ADMIN = ConversationHandler(
         )
     ],
     states={
-        SwitchState.SWITCHING: [
+        SwitchState.CHOOSE_ACTION: [
             CallbackQueryHandler(
                 all_lessons_button_admin, pattern="^" + CALLBACK_LESSON_PREFIX + "\d+"
-            )
+            ),
+            EDIT_LESSON_CONV_HANDLER_ADMIN,
         ]
     },
     fallbacks=[

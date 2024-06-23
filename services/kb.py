@@ -7,7 +7,14 @@ from config import (
     CALLBACK_DATA_EDIT_LESSON,
     CALLBACK_DATA_SUBSCRIBE_TO_LESSON,
 )
-from services.states import END, AdminState, InterimAdminState, InterimStartState
+from services.states import (
+    END,
+    AdminState,
+    EditLesson,
+    InterimAdminState,
+    InterimEditLesson,
+    InterimStartState,
+)
 
 
 def get_non_register_keyboard():
@@ -81,6 +88,32 @@ def get_admin_keyboard():
     return InlineKeyboardMarkup(buttons)
 
 
+def get_edit_lesson_keyboard():
+    buttons = [
+        [
+            InlineKeyboardButton(
+                "Изменить заголовок",
+                callback_data=str(InterimEditLesson.START_EDIT_TITLE),
+            ),
+            InlineKeyboardButton(
+                "Изменить дату",
+                callback_data=str(InterimEditLesson.START_EDIT_TIMESTART),
+            ),
+            InlineKeyboardButton(
+                "Изменить количество доступных мест",
+                callback_data=str(InterimEditLesson.START_EDIT_NUM_OF_SEATS),
+            ),
+        ],
+        [
+            InlineKeyboardButton(
+                "Завершить", callback_data=str(EditLesson.RETURN_PREV_CONV)
+            )
+        ],
+    ]
+
+    return InlineKeyboardMarkup(buttons)
+
+
 def get_confirmation_keyboard(prefix):
     buttons = [
         [
@@ -121,7 +154,7 @@ def get_flip_edit_delete_back_keyboard(
     keyboard.append(
         [
             InlineKeyboardButton(
-                "Изменить", callback_data=f"{prefix}{CALLBACK_DATA_EDIT_LESSON}"
+                "Изменить", callback_data=f"{InterimEditLesson.START_EDIT_LESSON}"
             ),
             InlineKeyboardButton(
                 "Удалить", callback_data=f"{prefix}{CALLBACK_DATA_DELETELESSON_ADMIN}"

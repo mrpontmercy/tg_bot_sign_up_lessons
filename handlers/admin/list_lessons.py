@@ -12,7 +12,7 @@ from services.db import get_user_by_id, get_user_by_tg_id
 from services.exceptions import LessonError, UserError
 from services.kb import get_back_keyboard, get_flip_edit_delete_back_keyboard
 from services.lesson import _lessons_button, get_all_lessons_from_db
-from services.states import SwitchState
+from services.states import END, SwitchState
 from services.user.lesson import get_lessons
 
 
@@ -36,7 +36,7 @@ async def show_all_lessons_admin(update: Update, context: ContextTypes.DEFAULT_T
         await edit_callbackquery_template(
             query, "error.jinja", err=str(e), keyboard=back_kb
         )
-        return SwitchState.SWITCHING
+        return SwitchState.CHOOSE_ACTION
 
     context.user_data["curr_lesson"] = lessons[0]
     kb = get_flip_edit_delete_back_keyboard(
@@ -49,7 +49,7 @@ async def show_all_lessons_admin(update: Update, context: ContextTypes.DEFAULT_T
         keyboard=kb,
     )
 
-    return SwitchState.SWITCHING
+    return SwitchState.CHOOSE_ACTION
 
 
 async def all_lessons_button_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -64,7 +64,7 @@ async def all_lessons_button_admin(update: Update, context: ContextTypes.DEFAULT
             err=str(e),
             keyboard=get_back_keyboard(SwitchState.RETURN_PREV_CONV),
         )
-        return SwitchState.SWITCHING
+        return SwitchState.CHOOSE_ACTION
 
     kb_func = get_flip_edit_delete_back_keyboard
     await _lessons_button(
@@ -75,7 +75,7 @@ async def all_lessons_button_admin(update: Update, context: ContextTypes.DEFAULT
         update=update,
         context=context,
     )
-    return SwitchState.SWITCHING
+    return SwitchState.CHOOSE_ACTION
 
 
 async def delete_lesson_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -94,10 +94,15 @@ async def delete_lesson_admin(update: Update, context: ContextTypes.DEFAULT_TYPE
                 err="Не удалось удалить занятие",
                 keyboard=back_kb,
             )
-            return SwitchState.SWITCHING
+            return SwitchState.CHOOSE_ACTION
 
     await update.callback_query.edit_message_text(
         result_message,
         reply_markup=back_kb,
     )
-    return SwitchState.SWITCHING
+    return SwitchState.CHOOSE_ACTION
+
+
+async def return_to_lessons_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await show_all_lessons_admin(update, context)
+    return END

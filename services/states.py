@@ -40,5 +40,20 @@ class AdminState(Enum):
 
 
 class SwitchState(Enum):
-    SWITCHING = auto()
+    CHOOSE_ACTION = auto()
     RETURN_PREV_CONV = auto()
+
+
+class EditLesson(Enum):
+    CHOOSE_ACTION = auto()
+    EDIT_TITLE = auto()
+    EDIT_TIMESTART = auto()
+    EDIT_NUM_OF_SEATS = auto()
+    RETURN_PREV_CONV = auto()
+
+
+class InterimEditLesson(Enum):
+    START_EDIT_LESSON = auto()
+    START_EDIT_TITLE = auto()
+    START_EDIT_TIMESTART = auto()
+    START_EDIT_NUM_OF_SEATS = auto()
