@@ -26,9 +26,9 @@ def main():
     app = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
     app.add_handler(START_CONV_HANLER)
     app.add_handler(ADMIN_CONV_HANDLER)
-    app.add_handlers(
-        [CQH_CONFIRM_SUBSCRIBE, CQH_CONFIRM_SUBCRIBE_YES, CQH_CONFIRM_SUBCRIBE_CANCEL]
-    )
+    # app.add_handlers(
+    #     [CQH_CONFIRM_SUBSCRIBE, CQH_CONFIRM_SUBCRIBE_YES, CQH_CONFIRM_SUBCRIBE_CANCEL]
+    # )
     app.run_polling(drop_pending_updates=True)
 
 

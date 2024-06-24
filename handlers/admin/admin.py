@@ -5,14 +5,12 @@ from handlers.response import (
     edit_callbackquery_template,
     send_template_message,
 )
-from services.user.kb import get_current_user_keyboard
+from services.decorators import admin_required
 from services.admin.kb import get_admin_keyboard
-from services.states import END, AdminState
-from services.decorators import (
-    ensure_no_active_conversation,
-)
+from services.states import AdminState, StopState
 
 
+@admin_required
 async def admin_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     tg_id = update.effective_user.id
 
@@ -36,11 +34,11 @@ async def return_to_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.callback_query.answer()
     # await delete_last_message_from_context(context)
     await admin_command(update, context)
-    return END
+    return StopState.STOPPING
 
 
 async def alert_user_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    kb = await get_current_user_keyboard(update)
+    kb = get_admin_keyboard()
     await update.effective_message.reply_text(
         "Сообщение не распознано. Выберите действие, либо введите /stop чтобы завершить беседу!",
         reply_markup=kb,

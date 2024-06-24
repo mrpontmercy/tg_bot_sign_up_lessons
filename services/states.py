@@ -44,6 +44,10 @@ class SwitchState(Enum):
     RETURN_PREV_CONV = auto()
 
 
+class StopState(Enum):
+    STOPPING = auto()
+
+
 class EditLesson(Enum):
     CHOOSE_ACTION = auto()
     EDIT_TITLE = auto()
@@ -59,3 +63,7 @@ class InterimEditLesson(Enum):
     START_EDIT_TIMESTART = auto()
     START_EDIT_NUM_OF_SEATS = auto()
     START_EDIT_LESSON_LINK = auto()
+
+
+class ConfirmationState(Enum):
+    CONFIRMATION = auto()

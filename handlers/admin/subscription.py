@@ -8,6 +8,7 @@ from services.admin.subscription import (
     generate_sub_key,
     validate_num_of_classes,
 )
+from services.decorators import admin_required
 from services.exceptions import InputMessageError
 from services.kb import get_back_keyboard, get_retry_or_back_keyboard
 from services.states import AdminState, InterimAdminState
@@ -19,6 +20,7 @@ from services.utils import (
 
 
 @add_message_info_into_context
+@admin_required
 async def start_generating_subscription(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ):
@@ -33,6 +35,7 @@ async def start_generating_subscription(
     return AdminState.GENERATE_SUB
 
 
+@admin_required
 async def make_new_subscription(update: Update, context: ContextTypes.DEFAULT_TYPE):
     retry_kb = get_retry_or_back_keyboard(
         InterimAdminState.START_GENERATE_SUB, InterimAdminState.BACK_TO_ADMIN

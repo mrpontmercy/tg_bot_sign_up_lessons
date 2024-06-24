@@ -3,6 +3,7 @@ from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 from handlers.response import send_error_message
 from services.admin.upload_lessons import process_insert_lesson_into_db
+from services.decorators import admin_required
 from services.kb import get_back_keyboard, get_retry_or_back_keyboard
 from services.states import AdminState, InterimAdminState
 from services.utils import (
@@ -12,6 +13,7 @@ from services.utils import (
 
 
 @add_message_info_into_context
+@admin_required
 async def start_inserting_lessons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -24,6 +26,7 @@ async def start_inserting_lessons(update: Update, context: ContextTypes.DEFAULT_
     return AdminState.INSERT_LESSONS
 
 
+@admin_required
 async def insert_lessons_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     rec_document = update.message.document
     user_tg_id = update.effective_user.id

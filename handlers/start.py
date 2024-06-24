@@ -1,7 +1,6 @@
 from telegram import ReplyKeyboardRemove, Update
 from telegram.ext import ContextTypes
 
-from services.decorators import ensure_no_active_conversation
 from services.user.kb import get_current_user_keyboard
 from services.states import END, StartState
 from services.templates import render_template
@@ -59,7 +58,7 @@ async def back_to_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def alert_user_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     kb = await get_current_user_keyboard(update)
     await update.effective_message.reply_text(
-        "Сообщение не распознано. Выберите действие, либо введите /stop чтобы завершить беседу!",
+        "START Сообщение не распознано. Выберите действие, либо введите /stop чтобы завершить беседу!",
         reply_markup=kb,
     )
     return StartState.CHOOSE_ACTION

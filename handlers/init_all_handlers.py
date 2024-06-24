@@ -63,11 +63,13 @@ from handlers.user.subscription import (
 from services.states import (
     END,
     AdminState,
+    ConfirmationState,
     EditLesson,
     InterimAdminState,
     InterimEditLesson,
     InterimStartState,
     StartState,
+    StopState,
     SwitchState,
 )
 
@@ -84,6 +86,12 @@ CQH_CONFIRM_SUBCRIBE_CANCEL = CallbackQueryHandler(
     cancel_action_button, pattern=".*_cancel_action$"
 )
 
+CONFIRMATION_HANDLERS = [
+    CQH_CONFIRM_SUBSCRIBE,
+    CQH_CONFIRM_SUBCRIBE_YES,
+    CQH_CONFIRM_SUBCRIBE_CANCEL,
+]
+
 AVAILABLE_LESSONS_CONV_HANDLER_USER = ConversationHandler(
     [
         CallbackQueryHandler(
@@ -95,7 +103,8 @@ AVAILABLE_LESSONS_CONV_HANDLER_USER = ConversationHandler(
         SwitchState.CHOOSE_ACTION: [
             CallbackQueryHandler(
                 available_lessons_button, pattern="^" + CALLBACK_LESSON_PREFIX + "\d+"
-            )
+            ),
+            *CONFIRMATION_HANDLERS,
         ]
     },
     fallbacks=[
@@ -116,7 +125,8 @@ SCHEDULE_LESSONS_CONV_HANDLER_USER = ConversationHandler(
             CallbackQueryHandler(
                 schedule_lessons_button,
                 pattern="^" + CALLBACK_USER_LESSON_PREFIX + "\d+",
-            )
+            ),
+            *CONFIRMATION_HANDLERS,
         ]
     },
     fallbacks=[
@@ -153,7 +163,8 @@ LIST_SUBS_CONV_HANDLER = ConversationHandler(
         SwitchState.CHOOSE_ACTION: [
             CallbackQueryHandler(
                 list_subs_button_admin, pattern="^" + CALLBACK_SUB_PREFIX + "\d+"
-            )
+            ),
+            *CONFIRMATION_HANDLERS,
         ]
     },
     fallbacks=[
@@ -161,7 +172,7 @@ LIST_SUBS_CONV_HANDLER = ConversationHandler(
             return_to_admin, pattern=f"^{SwitchState.RETURN_PREV_CONV}$"
         )
     ],
-    map_to_parent={END: AdminState.CHOOSE_ACTION},
+    map_to_parent={StopState.STOPPING: AdminState.CHOOSE_ACTION, END: END},
     allow_reentry=True,
 )
 
@@ -210,7 +221,7 @@ EDIT_LESSON_CONV_HANDLER_ADMIN = ConversationHandler(
             return_to_lessons_admin, pattern=f"^{EditLesson.RETURN_PREV_CONV}$"
         )
     ],
-    map_to_parent={END: SwitchState.CHOOSE_ACTION},
+    map_to_parent={StopState.STOPPING: SwitchState.CHOOSE_ACTION, END: END},
     allow_reentry=True,
 )
 
@@ -226,6 +237,7 @@ LIST_ALL_LESSONS_CONV_HANDLER_ADMIN = ConversationHandler(
                 all_lessons_button_admin, pattern="^" + CALLBACK_LESSON_PREFIX + "\d+"
             ),
             EDIT_LESSON_CONV_HANDLER_ADMIN,
+            *CONFIRMATION_HANDLERS,
         ]
     },
     fallbacks=[
@@ -233,7 +245,7 @@ LIST_ALL_LESSONS_CONV_HANDLER_ADMIN = ConversationHandler(
             return_to_admin, pattern=f"^{SwitchState.RETURN_PREV_CONV}$"
         )
     ],
-    map_to_parent={END: AdminState.CHOOSE_ACTION},
+    map_to_parent={StopState.STOPPING: AdminState.CHOOSE_ACTION, END: END},
     allow_reentry=True,
 )
 

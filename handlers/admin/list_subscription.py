@@ -5,12 +5,14 @@ from telegram.ext import ContextTypes
 from config import CALLBACK_SUB_PREFIX
 from handlers.response import edit_callbackquery_template
 from services.admin.list_subscription import delete_subscription, get_available_subs
+from services.decorators import admin_required
 from services.exceptions import SubscriptionError
 from services.kb import get_back_keyboard, get_flip_delete_back_keyboard
 from services.states import InterimAdminState, SwitchState
 from services.utils import Subscription
 
 
+@admin_required
 async def list_available_subs_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -38,6 +40,7 @@ async def list_available_subs_admin(update: Update, context: ContextTypes.DEFAUL
     return SwitchState.CHOOSE_ACTION
 
 
+@admin_required
 async def list_subs_button_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -66,6 +69,7 @@ async def list_subs_button_admin(update: Update, context: ContextTypes.DEFAULT_T
     return SwitchState.CHOOSE_ACTION
 
 
+@admin_required
 async def remove_subscription(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()

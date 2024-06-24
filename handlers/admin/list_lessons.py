@@ -9,13 +9,15 @@ from services.admin.list_lessons import (
     process_delete_lesson_db,
 )
 from services.db import get_user_by_id, get_user_by_tg_id
+from services.decorators import admin_required
 from services.exceptions import LessonError, UserError
 from services.kb import get_back_keyboard, get_flip_edit_delete_back_keyboard
 from services.lesson import lessons_button, get_all_lessons_from_db
-from services.states import END, InterimAdminState, SwitchState
+from services.states import END, InterimAdminState, StopState, SwitchState
 from services.user.lesson import get_lessons
 
 
+@admin_required
 async def show_all_lessons_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     Получить список всех доступных уроков, на которые пользователь еще не записан! (сортировать по дате начала занятия)
@@ -52,6 +54,7 @@ async def show_all_lessons_admin(update: Update, context: ContextTypes.DEFAULT_T
     return SwitchState.CHOOSE_ACTION
 
 
+@admin_required
 async def all_lessons_button_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         tg_id = context.user_data.get("curr_user_tg_id")
@@ -79,6 +82,7 @@ async def all_lessons_button_admin(update: Update, context: ContextTypes.DEFAULT
     return SwitchState.CHOOSE_ACTION
 
 
+@admin_required
 async def delete_lesson_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     tg_id = context.user_data.get("curr_user_tg_id")
 
@@ -106,4 +110,4 @@ async def delete_lesson_admin(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 async def return_to_lessons_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await show_all_lessons_admin(update, context)
-    return END
+    return StopState.STOPPING

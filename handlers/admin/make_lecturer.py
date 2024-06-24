@@ -3,6 +3,7 @@ import sqlite3
 from handlers.response import send_error_message
 from services.admin.lecturer import validate_phone_number
 from services.db import get_user_by_phone_number, update_user_to_lecturer
+from services.decorators import admin_required
 from services.exceptions import InputMessageError, UserError
 from services.kb import get_back_keyboard, get_retry_or_back_keyboard
 from services.states import AdminState, InterimAdminState
@@ -17,6 +18,7 @@ from telegram.ext import ContextTypes
 
 
 @add_message_info_into_context
+@admin_required
 async def enter_lecturer_phone_number(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ):
@@ -30,6 +32,7 @@ async def enter_lecturer_phone_number(
     return AdminState.ADD_LECTURER
 
 
+@admin_required
 async def make_lecturer(update: Update, context: ContextTypes.DEFAULT_TYPE):
     retry_kb = get_retry_or_back_keyboard(
         InterimAdminState.ENTER_LECTURER_PHONE, InterimAdminState.BACK_TO_ADMIN
