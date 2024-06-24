@@ -8,7 +8,7 @@ from handlers.response import edit_callbackquery_template
 from services.db import get_user_by_tg_id
 from services.exceptions import LessonError, SubscriptionError, UserError
 from services.kb import get_back_keyboard, get_flip_signup_back_keyboard
-from services.lesson import _lessons_button
+from services.lesson import lessons_button
 from services.states import InterimStartState, StartState, SwitchState
 from services.user.lesson import (
     get_available_upcoming_lessons_from_db,
@@ -72,7 +72,7 @@ async def available_lessons_button(update: Update, context: ContextTypes.DEFAULT
         return SwitchState.CHOOSE_ACTION
 
     kb_func = get_flip_signup_back_keyboard
-    await _lessons_button(
+    await lessons_button(
         lessons,
         kb_func,
         CALLBACK_LESSON_PREFIX,

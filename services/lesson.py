@@ -12,7 +12,7 @@ from services.templates import render_template
 from services.utils import Lesson, TransientLesson
 
 
-async def _lessons_button(
+async def lessons_button(
     lessons: list[Lesson],
     kb_func: Callable,
     pattern: str,

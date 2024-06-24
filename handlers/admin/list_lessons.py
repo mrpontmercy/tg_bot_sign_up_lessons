@@ -11,7 +11,7 @@ from services.admin.list_lessons import (
 from services.db import get_user_by_id, get_user_by_tg_id
 from services.exceptions import LessonError, UserError
 from services.kb import get_back_keyboard, get_flip_edit_delete_back_keyboard
-from services.lesson import _lessons_button, get_all_lessons_from_db
+from services.lesson import lessons_button, get_all_lessons_from_db
 from services.states import END, SwitchState
 from services.user.lesson import get_lessons
 
@@ -67,7 +67,7 @@ async def all_lessons_button_admin(update: Update, context: ContextTypes.DEFAULT
         return SwitchState.CHOOSE_ACTION
 
     kb_func = get_flip_edit_delete_back_keyboard
-    await _lessons_button(
+    await lessons_button(
         lessons=lessons,
         kb_func=kb_func,
         pattern=CALLBACK_LESSON_PREFIX,

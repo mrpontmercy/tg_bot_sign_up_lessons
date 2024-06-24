@@ -13,4 +13,9 @@
 Преподаватель: 
 <br>
 <b>{{ lecturer_full_name }}</b>
-<br>
+<br><br>
+{%if lesson_link %}
+<a href="{{ lesson_link }}">Ссылка на занятие</a>
+{% else %}
+Ссылка на занятие не указана
+{% endif %}

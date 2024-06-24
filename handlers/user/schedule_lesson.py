@@ -8,7 +8,7 @@ from handlers.response import edit_callbackquery_template
 from services.db import get_user_by_tg_id
 from services.exceptions import LessonError, SubscriptionError
 from services.kb import get_back_keyboard, get_flip_cancel_back_keyboard
-from services.lesson import _lessons_button
+from services.lesson import lessons_button
 from services.states import InterimStartState, SwitchState
 from services.user.lesson import get_lessons
 from services.user.schedule_lesson import (
@@ -73,7 +73,7 @@ async def schedule_lessons_button(update: Update, context: ContextTypes.DEFAULT_
         return state
 
     kb_func = get_flip_cancel_back_keyboard
-    await _lessons_button(
+    await lessons_button(
         lessons=lessons,
         kb_func=kb_func,
         pattern=CALLBACK_USER_LESSON_PREFIX,
