@@ -90,7 +90,7 @@ async def cancel_lesson(update: Update, context: ContextTypes.DEFAULT_TYPE):
     отменять не поздее чем за 2 часа до занятия
 
     Обновить информацию в таблице lesson
-    обновить количество уроков в абонименте
+    обновить количество уроков в абонементе
     удалить строчку из user_lesson
     """
     query = update.callback_query

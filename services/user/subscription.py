@@ -8,7 +8,7 @@ from services.utils import Subscription, UserID
 def validate_args(args: list[str] | None):
     if args is not None and len(args) != 1:
         raise InputMessageError(
-            "Нужно ввести только ключ абонимента!.\nПопробуйте снова."
+            "Нужно ввести только ключ абонемента!.\nПопробуйте снова."
         )
 
     return args
@@ -48,7 +48,7 @@ async def activate_key(sub_key: str, user: UserID):
             await (await get_db()).rollback()
             raise
         await (await get_db()).commit()
-        return "Ваш абонимент обновлен"
+        return "Ваш абонемент обновлен"
     try:
         await execute_update(
             "subscription",
@@ -62,7 +62,7 @@ async def activate_key(sub_key: str, user: UserID):
         )
     except Error as e:
         raise
-    return "Ваш абонимент активирован"
+    return "Ваш абонемент активирован"
 
 
 async def _get_sub_from_key(sub_key: str):
@@ -86,10 +86,10 @@ async def get_user_subscription(user_db_id: int):
         {"user_id": user_db_id},
     )
     if subsciption_by_user is None:
-        raise SubscriptionError("У пользователя нет абонимента")
+        raise SubscriptionError("У пользователя нет абонемент")
     elif subsciption_by_user.num_of_classes == 0:
         raise SubscriptionError(
-            "В вашем абонименте не осталось занятий. Обратитесь за новым абониментом!"
+            "В вашем абонементе не осталось занятий. Обратитесь за новым абонемент!"
         )
 
     return subsciption_by_user

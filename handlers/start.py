@@ -1,4 +1,4 @@
-from telegram import Update
+from telegram import ReplyKeyboardRemove, Update
 from telegram.ext import ContextTypes
 
 from services.decorators import ensure_no_active_conversation
@@ -27,8 +27,9 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         del context.user_data["START_OVER"]
     else:
         await update.message.reply_text(
-            render_template("start.jinja") + always_display_text, reply_markup=start_kb
+            render_template("start.jinja"), reply_markup=ReplyKeyboardRemove()
         )
+        await update.message.reply_text(always_display_text, reply_markup=start_kb)
     context.user_data.clear()
     return StartState.CHOOSE_ACTION
 

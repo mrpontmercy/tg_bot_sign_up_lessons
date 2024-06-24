@@ -20,7 +20,7 @@ async def get_all_subs():
 
     subs = await fetch_all(r_sql)
     if not subs:
-        raise SubscriptionError("Не удалось найти ни одного абонимента!")
+        raise SubscriptionError("Не удалось найти ни одного абонемента!")
 
     result = []
     for sub in subs:

@@ -37,7 +37,7 @@ async def start_activating_subkey(
         )
         return StartState.SHOWING
 
-    await query.edit_message_text("Отправьте ключ абонимента!", reply_markup=kb)
+    await query.edit_message_text("Отправьте ключ абонемента!", reply_markup=kb)
     context.user_data["curr_user_tg_id"] = user.telegram_id
     return StartState.ACTIVATE_SUBSCRIPTION
 
@@ -99,7 +99,7 @@ async def show_number_of_remaining_classes_on_subscription(
         return StartState.CHOOSE_ACTION
 
     await query.edit_message_text(
-        f"У вас осталось {subscription.num_of_classes} занятий на абонименте",
+        f"У вас осталось {subscription.num_of_classes} занятий на абонементе",
         reply_markup=back_kb,
     )
     return StartState.CHOOSE_ACTION

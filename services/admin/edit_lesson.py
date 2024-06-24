@@ -72,6 +72,7 @@ async def change_lesson_time_start(
         params={
             "time_start": message,
             "lecturer_id": curr_lesson.lecturer_id,
+            "lecturer_name": curr_lesson.lecturer_full_name,
             "lesson_id": curr_lesson.id,
         },
     )
@@ -106,7 +107,11 @@ async def change_lesson_num_of_seats(
             "lesson_id": curr_lesson.id,
         },
     )
-    data = {"title": curr_lesson.title, "num_of_seats": num_of_seats}
+    data = {
+        "title": curr_lesson.title,
+        "lecturer_name": curr_lesson.lecturer_full_name,
+        "num_of_seats": num_of_seats,
+    }
 
     # await notify_users_and_lecturer_changing_lesson(
     #     "notify_edit_num_of_seats_lesson.jinja", curr_lesson.id, curr_lesson.lecturer_id, data, context
@@ -139,7 +144,11 @@ async def change_lesson_link(
             "lesson_id": curr_lesson.id,
         },
     )
-    data = {"title": curr_lesson.title, "lesson_link": link}
+    data = {
+        "title": curr_lesson.title,
+        "lecturer_name": curr_lesson.lecturer_full_name,
+        "lesson_link": link,
+    }
 
     # await notify_users_and_lecturer_changing_lesson(
     #     "notify_edit_lesson_link.jinja", curr_lesson.id, curr_lesson.lecturer_id, data, context
