@@ -31,7 +31,9 @@ async def user_registration(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await delete_last_message_from_context(context)
     user = update.effective_user
     full_info = [user.id, user.username] + update.effective_message.text.split(" ")
-    retry_kb = get_retry_or_back_keyboard(InterimStartState.START_REGISTER, END)
+    retry_kb = get_retry_or_back_keyboard(
+        InterimStartState.START_REGISTER, InterimStartState.BACK_TO_START
+    )
     back_kb = get_back_keyboard(InterimStartState.BACK_TO_START)
     try:
         validated_message: User = validate_message(full_info)
@@ -40,7 +42,7 @@ async def user_registration(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Ошибка в данных, попробуйте снова. Возможная ошибка:\n\n" + str(e),
             reply_markup=retry_kb,
         )
-        return StartState.SHOWING
+        return StartState.CHOOSE_ACTION
 
     params = validated_message.to_dict()
     try:
@@ -52,8 +54,8 @@ async def user_registration(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Произошла ошибка.\nНачните регистрацию заново",
             reply_markup=back_kb,
         )
-        return StartState.SHOWING
+        return StartState.CHOOSE_ACTION
     await update.effective_message.reply_text(
         "Вы успешно зарегестрировались!", reply_markup=back_kb
     )
-    return StartState.SHOWING
+    return StartState.CHOOSE_ACTION
