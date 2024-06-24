@@ -48,19 +48,16 @@ async def register_sub_key_to_user(update: Update, context: ContextTypes.DEFAULT
         InterimStartState.START_ACTIVATE_SUBSCRIPTION, InterimStartState.BACK_TO_START
     )
     await delete_last_message_from_context(context)
-    try:
-        args = validate_args(mess_args)
-    except InputMessageError as e:
-        await send_error_message(user_tg_id, context, err=str(e), keyboard=retry_kb)
-        return StartState.CHOOSE_ACTION
-
     user_tg_id = context.user_data.get("curr_user_tg_id")
 
     if user_tg_id is None:
         await send_error_message(user_tg_id, context, err=str(e), keyboard=retry_kb)
         return StartState.CHOOSE_ACTION
-
-    del context.user_data["curr_user_tg_id"]
+    try:
+        args = validate_args(mess_args)
+    except InputMessageError as e:
+        await send_error_message(user_tg_id, context, err=str(e), keyboard=retry_kb)
+        return StartState.CHOOSE_ACTION
 
     sub_key = args[0]
     try:

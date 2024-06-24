@@ -78,6 +78,7 @@ async def schedule_lessons_button(update: Update, context: ContextTypes.DEFAULT_
         kb_func=kb_func,
         pattern=CALLBACK_USER_LESSON_PREFIX,
         back_button_callbackdata=str(SwitchState.RETURN_PREV_CONV),
+        template_name="lesson.jinja",
         update=update,
         context=context,
     )

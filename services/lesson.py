@@ -17,6 +17,7 @@ async def lessons_button(
     kb_func: Callable,
     pattern: str,
     back_button_callbackdata: str,
+    template_name: str,
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
 ):
@@ -32,7 +33,7 @@ async def lessons_button(
     kb = kb_func(current_index, len(lessons), pattern, back_button_callbackdata)
     await edit_callbackquery_template(
         update.callback_query,
-        "lesson.jinja",
+        template_name,
         data=lessons[current_index].to_dict_lesson_info(),
         keyboard=kb,
     )
@@ -40,7 +41,13 @@ async def lessons_button(
 
 def get_lessons_from_file(
     file_path: Path,
-    fieldnames: tuple[str] = ("title", "time_start", "num_of_seats", "lecturer_phone"),
+    fieldnames: tuple[str] = (
+        "title",
+        "time_start",
+        "num_of_seats",
+        "lecturer_phone",
+        "lesson_link",
+    ),
 ) -> list[TransientLesson] | None:
     lessons: list[TransientLesson] = []
     with open(file_path, "r", encoding="utf-8") as file:
@@ -68,7 +75,7 @@ async def insert_lesson_in_db(params):
 
 
 async def get_all_lessons_from_db(*args) -> list[Lesson]:
-    sql = """select l.id, l.title, l.time_start, l.num_of_seats, u.f_name || ' ' || u.s_name as lecturer_full_name, l.lecturer_id from lesson l
+    sql = """select l.id, l.title, l.time_start, l.num_of_seats, u.f_name || ' ' || u.s_name as lecturer_full_name, l.lecturer_id, l.lesson_link from lesson l
             join user u on u.id=l.lecturer_id"""
     rows = await fetch_all(sql)
 

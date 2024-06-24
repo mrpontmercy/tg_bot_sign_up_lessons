@@ -1,21 +1,8 @@
-Тема занятия:
-<br>
-<b>{{ title }}</b>
-<br>
-Дата и время начала занятия:
-<br>
-<b>{{ time_start }}</b>
-<br>
-Количество свободных мест:
-<br>
-<b>{{ num_of_seats }}</b>
-<br>
-Преподаватель: 
-<br>
-<b>{{ lecturer_full_name }}</b>
-<br><br>
-{%if lesson_link %}
+{% extends "lessons_without_link.jinja" %}
+{% block lesson_link %}
+{% if lesson_link %}
 <a href="{{ lesson_link }}">Ссылка на занятие</a>
 {% else %}
 Ссылка на занятие не указана
 {% endif %}
+{% endblock lesson_link %}

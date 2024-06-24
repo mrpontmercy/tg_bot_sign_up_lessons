@@ -31,8 +31,9 @@ async def edit_callbackquery_template(
     data: dict | None = None,
     replace: bool = True,
 ):
+    text = render_template(template_name, err=err, data=data, replace=replace)
     await query.edit_message_text(
-        render_template(template_name, err=err, data=data, replace=replace),
+        text=text,
         parse_mode=ParseMode.HTML,
         reply_markup=keyboard,
     )

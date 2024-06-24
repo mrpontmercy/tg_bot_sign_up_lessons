@@ -38,7 +38,7 @@ async def process_delete_lesson_admin(
     all_students_of_lesson = await get_all_users_of_lesson(lesson.id)
 
     if all_students_of_lesson is None:
-        return "Нет записанных студентов.\n\Занятие успешно отменено."
+        return "Нет записанных студентов.\nЗанятие успешно отменено."
 
     data = {
         "title": lesson.title,

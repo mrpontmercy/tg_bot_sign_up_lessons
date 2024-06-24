@@ -4,7 +4,7 @@ from telegram import Update, User
 from telegram.ext import ContextTypes
 
 from handlers.response import edit_callbackquery_template, send_template_message
-from handlers.start import get_current_keyboard
+from services.user.kb import get_current_user_keyboard
 from services.exceptions import ValidationError
 from services.kb import get_back_keyboard, get_retry_or_back_keyboard
 from services.user.registration import insert_user, validate_message

@@ -17,13 +17,16 @@ from config import (
 )
 from handlers.admin.admin import (
     admin_command,
+    alert_user_admin,
     return_to_admin,
 )
 from handlers.admin.edit_lesson import (
+    edit_lesson_link,
     edit_num_of_seats_lesson,
     edit_time_start_lesson,
     edit_title_lesson,
     start_edit_lesson,
+    start_edit_lesson_link_lesson,
     start_edit_num_of_seats_lesson,
     start_edit_time_start_lesson,
     start_edit_title_lesson,
@@ -50,7 +53,7 @@ from handlers.confirmation import (
 )
 from handlers.user.lesson import available_lessons_button, show_available_lessons
 from handlers.user.registration import start_registration, user_registration
-from handlers.start import back_to_start, start_command, stop
+from handlers.start import alert_user_start, back_to_start, start_command, stop
 from handlers.user.schedule_lesson import schedule_lessons_button, show_schedule_lessons
 from handlers.user.subscription import (
     register_sub_key_to_user,
@@ -139,31 +142,6 @@ START_CHOOSE_ACTION_HANDLERS = [
     SCHEDULE_LESSONS_CONV_HANDLER_USER,
 ]
 
-START_CONV_HANLER = ConversationHandler(
-    [CommandHandler("start", start_command)],
-    states={
-        StartState.CHOOSE_ACTION: START_CHOOSE_ACTION_HANDLERS,
-        StartState.REGISTRATION: [
-            MessageHandler(
-                filters.TEXT & filters.Regex("^(?!\/stop$).+"),
-                user_registration,
-            ),
-        ],
-        StartState.ACTIVATE_SUBSCRIPTION: [
-            MessageHandler(
-                filters.TEXT & filters.Regex("^(?!\/stop$).+"),
-                register_sub_key_to_user,
-            ),
-        ],
-    },
-    fallbacks=[
-        CommandHandler("stop", stop),
-        CallbackQueryHandler(
-            start_command, pattern=f"^{InterimStartState.BACK_TO_START}$"
-        ),
-    ],
-)
-
 LIST_SUBS_CONV_HANDLER = ConversationHandler(
     [
         CallbackQueryHandler(
@@ -200,6 +178,10 @@ EDIT_LESSON_CHOOSE_ACTION_HANDLERS = [
         start_edit_num_of_seats_lesson,
         pattern=f"^{InterimEditLesson.START_EDIT_NUM_OF_SEATS}$",
     ),
+    CallbackQueryHandler(
+        start_edit_lesson_link_lesson,
+        pattern=f"^{InterimEditLesson.START_EDIT_LESSON_LINK}$",
+    ),
 ]
 
 EDIT_LESSON_CONV_HANDLER_ADMIN = ConversationHandler(
@@ -218,6 +200,9 @@ EDIT_LESSON_CONV_HANDLER_ADMIN = ConversationHandler(
         ],
         EditLesson.EDIT_NUM_OF_SEATS: [
             MessageHandler(filters.TEXT & ~filters.COMMAND, edit_num_of_seats_lesson)
+        ],
+        EditLesson.EDIT_LESSON_LINK: [
+            MessageHandler(filters.TEXT & ~filters.COMMAND, edit_lesson_link)
         ],
     },
     fallbacks=[
@@ -301,5 +286,34 @@ ADMIN_CONV_HANDLER = ConversationHandler(
         CallbackQueryHandler(
             admin_command, pattern=f"^{InterimAdminState.BACK_TO_ADMIN}$"
         ),
+        MessageHandler(filters.TEXT, alert_user_admin),
+    ],
+)
+
+
+START_CONV_HANLER = ConversationHandler(
+    [CommandHandler("start", start_command)],
+    states={
+        StartState.CHOOSE_ACTION: START_CHOOSE_ACTION_HANDLERS,
+        StartState.REGISTRATION: [
+            MessageHandler(
+                filters.TEXT & filters.Regex("^(?!\/stop$).+"),
+                user_registration,
+            ),
+        ],
+        StartState.ACTIVATE_SUBSCRIPTION: [
+            MessageHandler(
+                filters.TEXT & filters.Regex("^(?!\/stop$).+"),
+                register_sub_key_to_user,
+            ),
+        ],
+    },
+    fallbacks=[
+        CommandHandler("stop", stop),
+        CallbackQueryHandler(
+            start_command, pattern=f"^{InterimStartState.BACK_TO_START}$"
+        ),
+        CallbackQueryHandler(stop, pattern=f"^{END}$"),
+        MessageHandler(filters.TEXT, alert_user_start),
     ],
 )

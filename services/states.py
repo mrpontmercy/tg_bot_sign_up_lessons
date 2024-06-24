@@ -49,6 +49,7 @@ class EditLesson(Enum):
     EDIT_TITLE = auto()
     EDIT_TIMESTART = auto()
     EDIT_NUM_OF_SEATS = auto()
+    EDIT_LESSON_LINK = auto()
     RETURN_PREV_CONV = auto()
 
 
@@ -57,3 +58,4 @@ class InterimEditLesson(Enum):
     START_EDIT_TITLE = auto()
     START_EDIT_TIMESTART = auto()
     START_EDIT_NUM_OF_SEATS = auto()
+    START_EDIT_LESSON_LINK = auto()

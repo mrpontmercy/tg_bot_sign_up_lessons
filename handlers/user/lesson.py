@@ -48,7 +48,7 @@ async def show_available_lessons(update: Update, context: ContextTypes.DEFAULT_T
     )
     await edit_callbackquery_template(
         query,
-        "lesson.jinja",
+        "lessons_without_link.jinja",
         data=lessons[0].to_dict_lesson_info(),
         keyboard=kb,
     )
@@ -77,6 +77,7 @@ async def available_lessons_button(update: Update, context: ContextTypes.DEFAULT
         kb_func,
         CALLBACK_LESSON_PREFIX,
         str(SwitchState.RETURN_PREV_CONV),
+        "lessons_without_link.jinja",
         update,
         context,
     )

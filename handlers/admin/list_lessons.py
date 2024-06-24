@@ -12,7 +12,7 @@ from services.db import get_user_by_id, get_user_by_tg_id
 from services.exceptions import LessonError, UserError
 from services.kb import get_back_keyboard, get_flip_edit_delete_back_keyboard
 from services.lesson import lessons_button, get_all_lessons_from_db
-from services.states import END, SwitchState
+from services.states import END, InterimAdminState, SwitchState
 from services.user.lesson import get_lessons
 
 
@@ -72,6 +72,7 @@ async def all_lessons_button_admin(update: Update, context: ContextTypes.DEFAULT
         kb_func=kb_func,
         pattern=CALLBACK_LESSON_PREFIX,
         back_button_callbackdata=str(SwitchState.RETURN_PREV_CONV),
+        template_name="lesson.jinja",
         update=update,
         context=context,
     )
@@ -82,7 +83,7 @@ async def delete_lesson_admin(update: Update, context: ContextTypes.DEFAULT_TYPE
     tg_id = context.user_data.get("curr_user_tg_id")
 
     curr_lesson = context.user_data.get("curr_lesson")
-    back_kb = get_back_keyboard(SwitchState.RETURN_PREV_CONV)
+    back_kb = get_back_keyboard(InterimAdminState.SHOW_ALL_LESSONS)
 
     if curr_lesson:
         try:

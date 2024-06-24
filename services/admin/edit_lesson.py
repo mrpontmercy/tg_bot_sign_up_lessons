@@ -9,7 +9,7 @@ from services.notification import (
     notify_users_and_lecturer_changing_lesson,
     notify_users_changing_lesson,
 )
-from services.utils import DATE_TIME_PATTERN, Lesson
+from services.utils import DATE_TIME_PATTERN, URL_PATTERN, Lesson
 
 
 async def change_lesson_title(
@@ -113,6 +113,50 @@ async def change_lesson_num_of_seats(
     # )
 
     return False, None
+
+
+async def change_lesson_link(
+    user_tg_id, message: str, context: ContextTypes.DEFAULT_TYPE
+):
+    curr_lesson: Lesson | None = context.user_data.get("curr_lesson", None)
+
+    if curr_lesson is None:
+        await send_error_message(user_tg_id, context, err="Не удалось найти урок")
+        return True, "Не удалось найти урок"
+
+    try:
+        link = _validate_lesson_link(message)
+    except InputMessageError as e:
+        return True, str(e)
+
+    await execute_update(
+        "lesson",
+        "lesson_link=:lesson_link",
+        "lecturer_id=:lecturer_id AND id=:lesson_id",
+        params={
+            "lesson_link": link,
+            "lecturer_id": curr_lesson.lecturer_id,
+            "lesson_id": curr_lesson.id,
+        },
+    )
+    data = {"title": curr_lesson.title, "lesson_link": link}
+
+    # await notify_users_and_lecturer_changing_lesson(
+    #     "notify_edit_lesson_link.jinja", curr_lesson.id, curr_lesson.lecturer_id, data, context
+    # )
+
+    return False, None
+
+
+def _validate_lesson_link(link: str):
+    link = link.split(" ")
+    if len(link) != 1:
+        raise InputMessageError("Количество слов в сообщение должно быть равным 1")
+
+    if not re.fullmatch(URL_PATTERN, link[0], flags=re.I):
+        raise InputMessageError("Сообщение должно содержать только ссылку на занятие")
+
+    return link[0]
 
 
 def _validate_datetime(message: str):

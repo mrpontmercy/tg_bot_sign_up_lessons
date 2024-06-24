@@ -16,6 +16,7 @@ PHONE_NUMBER_PATTERN = r"^[8][0-9]{10}$"  # Для российских номе
 FS_NAME_PATTERN = r"^[a-zA-Zа-яёА-ЯЁ]{3,}$"
 EMAIL_PATTERN = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
 DATE_TIME_PATTERN = r"^\d{4}-(0?[1-9]|1[0-2])-(0?[1-9]|[12]\d|3[01]) (0?[0-9]|1[0-9]|2[0-3]):([0-5][0-9])$"
+URL_PATTERN = r"^(https:|http).*$"  # Очень упрощенный вариант
 
 
 @dataclass
@@ -77,6 +78,7 @@ class TransientLesson:
     title: str
     time_start: str
     num_of_seats: str
+    lesson_link: str | None
     lecturer_phone: str | None = None
 
     def __post_init__(self):
@@ -93,6 +95,7 @@ class TransientLesson:
             "time_start": self.time_start,
             "num_of_seats": self.num_of_seats,
             "lecturer_phone": self.lecturer_phone,
+            "lesson_link": self.lesson_link,
         }
 
 
@@ -104,6 +107,7 @@ class Lesson:
     num_of_seats: str | int
     lecturer_full_name: str
     lecturer_id: str | int
+    lesson_link: str | None
 
     def __post_init__(self):
         isinstances = [
@@ -124,6 +128,7 @@ class Lesson:
             "num_of_seats": self.num_of_seats,
             "lecturer": self.lecturer_full_name,
             "lecturer_id": self.lecturer_id,
+            "lesson_link": self.lesson_link,
         }
 
         return result
@@ -134,6 +139,7 @@ class Lesson:
             "time_start": self.time_start,
             "num_of_seats": self.num_of_seats,
             "lecturer_full_name": self.lecturer_full_name,
+            "lesson_link": self.lesson_link,
         }
 
 
