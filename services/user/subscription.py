@@ -49,7 +49,6 @@ async def activate_subscription_by_key(sub_key: str, user: UserID):
     sub_by_user = await get_user_subscription_by_key_length(
         user.id, len(curr_sub_by_key.sub_key)
     )
-    sub_by_user.num_of_classes
     # Если это индивидуальная подписка то просто увеличиваем количество занятий на абонементе
     if sub_by_user is not None and len(sub_by_user.sub_key) == LEN_INDIVIDUAL_SUB_KEY:
         num_of_classes_left = sub_by_user.num_of_classes

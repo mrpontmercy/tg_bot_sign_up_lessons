@@ -21,8 +21,16 @@ from handlers.admin.list_subscription import (
     list_available_individual_subs_admin,
     remove_subscription,
 )
-from handlers.user.lesson import show_available_lessons, subscribe_to_lesson
-from handlers.user.schedule_lesson import cancel_lesson, show_schedule_lessons
+from handlers.user.lesson import (
+    show_available_group_lessons,
+    show_available_individual_lessons,
+    subscribe_to_lesson,
+)
+from handlers.user.schedule_lesson import (
+    cancel_lesson,
+    show_schedule_group_lessons,
+    show_schedule_individual_lessons,
+)
 from services.kb import get_back_keyboard, get_confirmation_keyboard
 from services.states import AdminState, InterimAdminState
 
@@ -82,9 +90,17 @@ async def cancel_action_button(update: Update, context: ContextTypes.DEFAULT_TYP
         elif sub_type == SUB_GROUP_CODE:
             await list_available_group_subs_admin(update, context)
     if action == CALLBACK_DATA_SUBSCRIBE_TO_LESSON:
-        await show_available_lessons(update, context)
+        lesson = context.user_data.get("curr_lesson")
+        if lesson.is_group:
+            await show_available_group_lessons(update, context)
+        else:
+            await show_available_individual_lessons(update, context)
     elif action == CALLBACK_DATA_CANCEL_LESSON:
-        await show_schedule_lessons(update, context)
+        lesson = context.user_data.get("curr_lesson")
+        if lesson.is_group:
+            await show_schedule_group_lessons(update, context)
+        else:
+            await show_schedule_individual_lessons(update, context)
     elif action == CALLBACK_DATA_DELETELESSON_ADMIN:
         lesson = context.user_data.get("curr_lesson")
         if lesson.is_group:

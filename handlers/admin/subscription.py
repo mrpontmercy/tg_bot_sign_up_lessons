@@ -3,7 +3,11 @@ import sqlite3
 from telegram import Update
 from telegram.ext import ContextTypes
 from config import LEN_GROUP_SUB_KEY, LEN_INDIVIDUAL_SUB_KEY
-from handlers.response import send_error_message, send_template_message
+from handlers.response import (
+    edit_callbackquery_template,
+    send_error_message,
+    send_template_message,
+)
 from services.kb import get_type_subscription_keyboard
 from services.admin.subscription import (
     add_group_subscription_to_db,
@@ -119,12 +123,9 @@ async def start_generating_group_subscription(
 
     context.user_data["sub_key"] = sub_key
     back_kb = get_back_keyboard(InterimAdminState.BACK_TO_ADMIN)
-    answer = f"""Отлично, теперь введите количество занятий, дату начала, дату окончания группового абонемента.
-    Пример:
-    10
-    2024-08-10
-     2024-09-10"""
-    await query.edit_message_text(answer, reply_markup=back_kb)
+    await edit_callbackquery_template(
+        query, "generate_group_subscription.jinja", keyboard=back_kb
+    )
     return AdminState.GENERATE_GROUP_SUB
 
 

@@ -73,10 +73,22 @@ from handlers.confirmation import (
     confirm_action_button,
     confirmation_action_handler,
 )
-from handlers.user.lesson import available_lessons_button, show_available_lessons
+from handlers.user.lesson import (
+    available_group_lessons_button,
+    available_individual_lessons_button,
+    show_available_group_lessons,
+    show_available_individual_lessons,
+    start_show_lessons,
+)
 from handlers.user.registration import start_registration, user_registration
 from handlers.start import alert_user_start, back_to_start, start_command, stop
-from handlers.user.schedule_lesson import schedule_lessons_button, show_schedule_lessons
+from handlers.user.schedule_lesson import (
+    schedule_group_lessons_button,
+    schedule_individual_lessons_button,
+    show_schedule_group_lessons,
+    show_schedule_individual_lessons,
+    start_show_schedule_lessons,
+)
 from handlers.user.subscription import (
     register_sub_key_to_user,
     show_remainder_of_group_subscription,
@@ -116,49 +128,6 @@ CONFIRMATION_HANDLERS = [
     CQH_CONFIRM_SUBCRIBE_CANCEL,
 ]
 
-AVAILABLE_LESSONS_CONV_HANDLER_USER = ConversationHandler(
-    [
-        CallbackQueryHandler(
-            show_available_lessons,
-            pattern=f"^{InterimStartState.SHOW_AVAILABLE_LESSONS}$",
-        )
-    ],
-    states={
-        SwitchState.CHOOSE_ACTION: [
-            CallbackQueryHandler(
-                available_lessons_button, pattern="^" + CALLBACK_LESSON_PREFIX + "\d+"
-            ),
-            *CONFIRMATION_HANDLERS,
-        ]
-    },
-    fallbacks=[
-        CallbackQueryHandler(back_to_start, pattern=f"^{SwitchState.RETURN_PREV_CONV}$")
-    ],
-    map_to_parent={END: StartState.CHOOSE_ACTION},
-    allow_reentry=True,
-)
-
-SCHEDULE_LESSONS_CONV_HANDLER_USER = ConversationHandler(
-    [
-        CallbackQueryHandler(
-            show_schedule_lessons, pattern=f"^{InterimStartState.SHOW_SCHEDULE_LESSONS}$"
-        )
-    ],
-    states={
-        SwitchState.CHOOSE_ACTION: [
-            CallbackQueryHandler(
-                schedule_lessons_button,
-                pattern="^" + CALLBACK_USER_LESSON_PREFIX + "\d+",
-            ),
-            *CONFIRMATION_HANDLERS,
-        ]
-    },
-    fallbacks=[
-        CallbackQueryHandler(back_to_start, pattern=f"^{SwitchState.RETURN_PREV_CONV}$")
-    ],
-    map_to_parent={END: StartState.CHOOSE_ACTION},
-    allow_reentry=True,
-)
 
 LIST_SUBS_CONV_HANDLER = ConversationHandler(
     [
@@ -367,6 +336,77 @@ ADMIN_CONV_HANDLER = ConversationHandler(
         ),
         MessageHandler(filters.TEXT, alert_user_admin),
     ],
+)
+
+
+AVAILABLE_LESSONS_CONV_HANDLER_USER = ConversationHandler(
+    [
+        CallbackQueryHandler(
+            start_show_lessons,
+            pattern=f"^{InterimStartState.SHOW_AVAILABLE_LESSONS}$",
+        )
+    ],
+    states={
+        SwitchState.CHOOSE_ACTION: [
+            CallbackQueryHandler(
+                show_available_group_lessons,
+                pattern=f"^{CALLBACK_DATA_GROUP_LESSON}$",
+            ),
+            CallbackQueryHandler(
+                show_available_individual_lessons,
+                pattern=f"^{CALLBACK_DATA_INDIVIDUAL_LESSON}$",
+            ),
+            CallbackQueryHandler(
+                available_group_lessons_button,
+                pattern="^" + CALLBACK_DATA_GROUP_LESSON_PREFIX + "\d+",
+            ),
+            CallbackQueryHandler(
+                available_individual_lessons_button,
+                pattern="^" + CALLBACK_DATA_INDIVIDUAL_LESSON_PREFIX + "\d+",
+            ),
+            *CONFIRMATION_HANDLERS,
+        ]
+    },
+    fallbacks=[
+        CallbackQueryHandler(back_to_start, pattern=f"^{SwitchState.RETURN_PREV_CONV}$")
+    ],
+    map_to_parent={END: StartState.CHOOSE_ACTION},
+    allow_reentry=True,
+)
+
+SCHEDULE_LESSONS_CONV_HANDLER_USER = ConversationHandler(
+    [
+        CallbackQueryHandler(
+            start_show_schedule_lessons,
+            pattern=f"^{InterimStartState.SHOW_SCHEDULE_LESSONS}$",
+        )
+    ],
+    states={
+        SwitchState.CHOOSE_ACTION: [
+            CallbackQueryHandler(
+                show_schedule_group_lessons,
+                pattern=f"^{CALLBACK_DATA_GROUP_LESSON}$",
+            ),
+            CallbackQueryHandler(
+                show_schedule_individual_lessons,
+                pattern=f"^{CALLBACK_DATA_INDIVIDUAL_LESSON}$",
+            ),
+            CallbackQueryHandler(
+                schedule_group_lessons_button,
+                pattern="^" + CALLBACK_DATA_GROUP_LESSON_PREFIX + "\d+",
+            ),
+            CallbackQueryHandler(
+                schedule_individual_lessons_button,
+                pattern="^" + CALLBACK_DATA_INDIVIDUAL_LESSON_PREFIX + "\d+",
+            ),
+            *CONFIRMATION_HANDLERS,
+        ]
+    },
+    fallbacks=[
+        CallbackQueryHandler(back_to_start, pattern=f"^{SwitchState.RETURN_PREV_CONV}$")
+    ],
+    map_to_parent={END: StartState.CHOOSE_ACTION},
+    allow_reentry=True,
 )
 
 

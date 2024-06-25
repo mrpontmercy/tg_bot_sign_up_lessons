@@ -64,10 +64,10 @@ def get_edit_lesson_keyboard():
 def get_confirmation_keyboard(prefix):
     buttons = [
         [
+            InlineKeyboardButton("Отменить", callback_data=f"{prefix}_cancel_action"),
             InlineKeyboardButton(
                 "Подтвердить", callback_data=f"{prefix}_confirm_action"
             ),
-            InlineKeyboardButton("Отменить", callback_data=f"{prefix}_cancel_action"),
         ]
     ]
 
@@ -84,10 +84,10 @@ def get_retry_or_back_keyboard(retry_state, end_state):
     buttons = InlineKeyboardMarkup(
         [
             [
+                InlineKeyboardButton("Назад", callback_data=str(end_state)),
                 InlineKeyboardButton(
                     "Попробовать снова", callback_data=str(retry_state)
                 ),
-                InlineKeyboardButton("Назад", callback_data=str(end_state)),
             ]
         ]
     )
