@@ -61,7 +61,8 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 db.sql
-
+db_copy.sql
+db_test.sqlite3
 # Flask stuff:
 instance/
 .webassets-cache

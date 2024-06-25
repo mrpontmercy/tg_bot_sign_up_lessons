@@ -47,6 +47,7 @@ def get_lessons_from_file(
         "num_of_seats",
         "lecturer_phone",
         "lesson_link",
+        "is_group",
     ),
 ) -> list[TransientLesson] | None:
     lessons: list[TransientLesson] = []

@@ -27,7 +27,8 @@ async def get_lecturer_and_error_by_phone(phone_number):
     return lecturer, None
 
 
-async def insert_lessons_if_possible_db(lessons: list[TransientLesson]):
+async def insert_lessons_if_possible_db(lessons: list[TransientLesson], is_group: bool):
+    "Добавление уроков в бд в зависимости от типа занятия is_group=True - Групповое, is_group=False - индивидуальное"
     res_err = []
 
     for lesson in lessons:
@@ -36,7 +37,7 @@ async def insert_lessons_if_possible_db(lessons: list[TransientLesson]):
             res_err.append((message, lesson.title))
             continue
 
-        params = make_lesson_params(lesson, lecuturer_id=lecturer.id)
+        params = make_lesson_params(lesson, lecuturer_id=lecturer.id, is_group=is_group)
         try:
             await insert_lesson_in_db(params)
         except Error as e:
@@ -49,6 +50,7 @@ async def insert_lessons_if_possible_db(lessons: list[TransientLesson]):
 async def process_insert_lesson_into_db(
     recieved_file: Document,
     user_tg_id: int,
+    is_group: bool,
     context: ContextTypes.DEFAULT_TYPE,
 ):
     file_path = await get_saved_lessonfile_path(recieved_file, context)
@@ -60,7 +62,9 @@ async def process_insert_lesson_into_db(
             False,
             "Неверно заполнен файл. Возможно файл пустой. Попробуй с другим файлом.",
         )
-    errors_after_inserting_lessons = await insert_lessons_if_possible_db(lessons)
+    errors_after_inserting_lessons = await insert_lessons_if_possible_db(
+        lessons, is_group
+    )
 
     if errors_after_inserting_lessons:
         await context.bot.send_message(

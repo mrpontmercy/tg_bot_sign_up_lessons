@@ -118,7 +118,7 @@ async def get_user_by_phone_number(phone_number):
 
 async def insert_lesson_in_db(params):
     await execute(
-        """INSERT INTO lesson (title, time_start, num_of_seats, lecturer_id, lesson_link) VALUES (:title, :time_start,:num_of_seats, :lecturer_id, :lesson_link)""",
+        """INSERT INTO lesson (title, time_start, num_of_seats, lecturer_id, lesson_link, is_group) VALUES (:title, :time_start,:num_of_seats, :lecturer_id, :lesson_link, :is_group)""",
         params,
     )
 

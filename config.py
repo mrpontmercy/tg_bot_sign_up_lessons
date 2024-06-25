@@ -9,6 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent
 TELEGRAM_BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 SQLITE_DB_FILE = BASE_DIR / "db.sqlite3"
+SQLITE_DB_TEST_FILE = BASE_DIR / "db_test.sqlite3"
 LESSONS_DIR = BASE_DIR / "course_files"
 TEMPLATE_DIR = BASE_DIR / "templates"
 
@@ -21,6 +22,9 @@ CALLBACK_DATA_DELETELESSON_ADMIN = "deleteLessonAdmin"
 CALLBACK_SUB_PREFIX = "sub_"
 CALLBACK_LESSON_PREFIX = "lesson_"
 CALLBACK_USER_LESSON_PREFIX = "user_lesson_"
+
+CALLBACK_DATA_GROUP_LESSON = CALLBACK_LESSON_PREFIX + "group"
+CALLBACK_DATA_INDIVIDUAL_LESSON = CALLBACK_LESSON_PREFIX + "individual"
 
 
 DATETIME_FORMAT = "%Y-%m-%d %H:%M"

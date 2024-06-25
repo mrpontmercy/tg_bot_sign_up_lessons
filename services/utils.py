@@ -80,6 +80,7 @@ class TransientLesson:
     num_of_seats: str
     lesson_link: str | None
     lecturer_phone: str | None = None
+    is_group: bool = True
 
     def __post_init__(self):
         if self.lecturer_phone is not None and not re.fullmatch(
@@ -96,6 +97,7 @@ class TransientLesson:
             "num_of_seats": self.num_of_seats,
             "lecturer_phone": self.lecturer_phone,
             "lesson_link": self.lesson_link,
+            "is_group": self.is_group,
         }
 
 
@@ -108,6 +110,7 @@ class Lesson:
     lecturer_full_name: str
     lecturer_id: str | int
     lesson_link: str | None
+    is_group: bool = field(default=True)
 
     def __post_init__(self):
         isinstances = [
@@ -129,6 +132,7 @@ class Lesson:
             "lecturer": self.lecturer_full_name,
             "lecturer_id": self.lecturer_id,
             "lesson_link": self.lesson_link,
+            "is_group": self.is_group,
         }
 
         return result
@@ -192,8 +196,9 @@ async def get_saved_lessonfile_path(
     return saved_file_path
 
 
-def make_lesson_params(lesson: TransientLesson, lecuturer_id: int):
+def make_lesson_params(lesson: TransientLesson, lecuturer_id: int, is_group: bool):
     param = lesson.to_dict()
+    param["is_group"] = is_group
     del param["lecturer_phone"]
     param["lecturer_id"] = lecuturer_id
     return param

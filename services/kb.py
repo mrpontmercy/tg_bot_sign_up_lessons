@@ -4,12 +4,27 @@ from config import (
     CALLBACK_DATA_CANCEL_LESSON,
     CALLBACK_DATA_DELETELESSON_ADMIN,
     CALLBACK_DATA_DELETESUBSCRIPTION,
+    CALLBACK_DATA_GROUP_LESSON,
+    CALLBACK_DATA_INDIVIDUAL_LESSON,
     CALLBACK_DATA_SUBSCRIBE_TO_LESSON,
 )
 from services.states import (
     EditLesson,
     InterimEditLesson,
 )
+
+
+def get_type_lesson_keyboard(back_button_state):
+    buttons = [
+        [
+            InlineKeyboardButton(
+                "Индивидуальные", callback_data=CALLBACK_DATA_INDIVIDUAL_LESSON
+            ),
+            InlineKeyboardButton("Групповые", callback_data=CALLBACK_DATA_GROUP_LESSON),
+        ],
+        [InlineKeyboardButton("Назад", callback_data=str(back_button_state))],
+    ]
+    return InlineKeyboardMarkup(buttons)
 
 
 def get_edit_lesson_keyboard():

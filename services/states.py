@@ -36,7 +36,8 @@ class AdminState(Enum):
     CHOOSE_ACTION = auto()
     GENERATE_SUB = auto()
     ADD_LECTURER = auto()
-    INSERT_LESSONS = auto()
+    INSERT_GROUP_LESSONS = auto()
+    INSERT_INDIVIDUAL_LESSONS = auto()
 
 
 class SwitchState(Enum):

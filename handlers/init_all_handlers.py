@@ -10,6 +10,8 @@ from config import (
     CALLBACK_DATA_CANCEL_LESSON,
     CALLBACK_DATA_DELETELESSON_ADMIN,
     CALLBACK_DATA_DELETESUBSCRIPTION,
+    CALLBACK_DATA_GROUP_LESSON,
+    CALLBACK_DATA_INDIVIDUAL_LESSON,
     CALLBACK_DATA_SUBSCRIBE_TO_LESSON,
     CALLBACK_LESSON_PREFIX,
     CALLBACK_SUB_PREFIX,
@@ -45,7 +47,13 @@ from handlers.admin.subscription import (
     make_new_subscription,
     start_generating_subscription,
 )
-from handlers.admin.upload_lessons import insert_lessons_handler, start_inserting_lessons
+from handlers.admin.upload_lessons import (
+    insert_group_lessons_handler,
+    insert_individual_lessons_handler,
+    start_inserting_group_lessons,
+    start_inserting_individual_lessons,
+    start_inserting_lessons,
+)
 from handlers.confirmation import (
     cancel_action_button,
     confirm_action_button,
@@ -260,8 +268,20 @@ ADMIN_CHOOSE_ACTION_HANDLERS = [
         pattern=f"^{InterimAdminState.START_GENERATE_SUB}$",
     ),
     CallbackQueryHandler(
-        start_inserting_lessons, pattern=f"^{InterimAdminState.START_UPDATE_LESSONS}$"
+        start_inserting_lessons,
+        pattern=f"^{InterimAdminState.START_UPDATE_LESSONS}$",
     ),
+    CallbackQueryHandler(
+        start_inserting_group_lessons, pattern=f"^{CALLBACK_DATA_GROUP_LESSON}$"
+    ),
+    CallbackQueryHandler(
+        start_inserting_individual_lessons,
+        pattern=f"^{CALLBACK_DATA_INDIVIDUAL_LESSON}$",
+    ),
+    # CallbackQueryHandler(
+    #     start_inserting_individual_lessons,
+    #     pattern=f"^{InterimAdminState.START_UPDATE_LESSONS}$",
+    # ),
     LIST_SUBS_CONV_HANDLER,
     LIST_ALL_LESSONS_CONV_HANDLER_ADMIN,
 ]
@@ -285,10 +305,16 @@ ADMIN_CONV_HANDLER = ConversationHandler(
                 make_new_subscription,
             )
         ],
-        AdminState.INSERT_LESSONS: [
+        AdminState.INSERT_GROUP_LESSONS: [
             MessageHandler(
                 filters.Document.MimeType("text/csv"),
-                insert_lessons_handler,
+                insert_group_lessons_handler,
+            ),
+        ],
+        AdminState.INSERT_INDIVIDUAL_LESSONS: [
+            MessageHandler(
+                filters.Document.MimeType("text/csv"),
+                insert_individual_lessons_handler,
             ),
         ],
     },
