@@ -20,7 +20,6 @@ from config import (
     CALLBACK_DATA_INDIVIDUAL_SUBSCRIPTION_PREFIX,
     CALLBACK_DATA_SUBSCRIBE_TO_LESSON,
     CALLBACK_LESSON_PREFIX,
-    CALLBACK_SUBSCRIPTION_PREFIX,
     CALLBACK_USER_LESSON_PREFIX,
 )
 from handlers.admin.admin import (
@@ -80,13 +79,14 @@ from handlers.start import alert_user_start, back_to_start, start_command, stop
 from handlers.user.schedule_lesson import schedule_lessons_button, show_schedule_lessons
 from handlers.user.subscription import (
     register_sub_key_to_user,
-    show_number_of_remaining_classes_on_subscription,
+    show_remainder_of_group_subscription,
+    show_remainder_of_individual_subscription,
+    show_remainder_of_subscription,
     start_activating_subkey,
 )
 from services.states import (
     END,
     AdminState,
-    ConfirmationState,
     EditLesson,
     InterimAdminState,
     InterimEditLesson,
@@ -159,22 +159,6 @@ SCHEDULE_LESSONS_CONV_HANDLER_USER = ConversationHandler(
     map_to_parent={END: StartState.CHOOSE_ACTION},
     allow_reentry=True,
 )
-
-START_CHOOSE_ACTION_HANDLERS = [
-    CallbackQueryHandler(
-        start_registration, pattern=f"^{InterimStartState.START_REGISTER}$"
-    ),
-    CallbackQueryHandler(
-        start_activating_subkey,
-        pattern=f"^{InterimStartState.START_ACTIVATE_SUBSCRIPTION}$",
-    ),
-    CallbackQueryHandler(
-        show_number_of_remaining_classes_on_subscription,
-        pattern=f"^{InterimStartState.SHOW_REMAINDER_SUBSCRIPTION}$",
-    ),
-    AVAILABLE_LESSONS_CONV_HANDLER_USER,
-    SCHEDULE_LESSONS_CONV_HANDLER_USER,
-]
 
 LIST_SUBS_CONV_HANDLER = ConversationHandler(
     [
@@ -386,10 +370,36 @@ ADMIN_CONV_HANDLER = ConversationHandler(
 )
 
 
+START_CHOOSE_ACTION_HANDLERS = [
+    CallbackQueryHandler(
+        start_registration, pattern=f"^{InterimStartState.START_REGISTER}$"
+    ),
+    CallbackQueryHandler(
+        start_activating_subkey,
+        pattern=f"^{InterimStartState.START_ACTIVATE_SUBSCRIPTION}$",
+    ),
+    CallbackQueryHandler(
+        show_remainder_of_subscription,
+        pattern=f"^{InterimStartState.SHOW_REMAINDER_SUBSCRIPTION}$",
+    ),
+    AVAILABLE_LESSONS_CONV_HANDLER_USER,
+    SCHEDULE_LESSONS_CONV_HANDLER_USER,
+]
+
 START_CONV_HANLER = ConversationHandler(
     [CommandHandler("start", start_command)],
     states={
         StartState.CHOOSE_ACTION: START_CHOOSE_ACTION_HANDLERS,
+        StartState.CHOOSE_SUBSCRIPTION: [
+            CallbackQueryHandler(
+                show_remainder_of_individual_subscription,
+                pattern=f"^{CALLBACK_DATA_INDIVIDUAL_SUBSCRIPTION}$",
+            ),
+            CallbackQueryHandler(
+                show_remainder_of_group_subscription,
+                pattern=f"^{CALLBACK_DATA_GROUP_SUBSCRIPTION}$",
+            ),
+        ],
         StartState.REGISTRATION: [
             MessageHandler(
                 filters.TEXT & filters.Regex("^(?!\/stop$).+"),

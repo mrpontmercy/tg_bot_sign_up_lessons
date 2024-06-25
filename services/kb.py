@@ -5,7 +5,9 @@ from config import (
     CALLBACK_DATA_DELETELESSON_ADMIN,
     CALLBACK_DATA_DELETESUBSCRIPTION,
     CALLBACK_DATA_GROUP_LESSON,
+    CALLBACK_DATA_GROUP_SUBSCRIPTION,
     CALLBACK_DATA_INDIVIDUAL_LESSON,
+    CALLBACK_DATA_INDIVIDUAL_SUBSCRIPTION,
     CALLBACK_DATA_SUBSCRIBE_TO_LESSON,
 )
 from services.states import (
@@ -183,3 +185,22 @@ def _get_flip_buttons(current_index, number_of_items, prefix):
         ],
     ]
     return buttons
+
+
+def get_type_subscription_keyboard(back_button_state):
+    buttons = [
+        [
+            InlineKeyboardButton(
+                "Индивидуальная(Бессрочная)",
+                callback_data=CALLBACK_DATA_INDIVIDUAL_SUBSCRIPTION,
+            ),
+        ],
+        [
+            InlineKeyboardButton(
+                "Групповая(Временная)",
+                callback_data=CALLBACK_DATA_GROUP_SUBSCRIPTION,
+            )
+        ],
+        [InlineKeyboardButton("Назад", callback_data=str(back_button_state))],
+    ]
+    return InlineKeyboardMarkup(buttons)

@@ -2,7 +2,7 @@ from typing import Any, Iterable
 from config import LECTURER_STATUS
 from db import execute, fetch_all, fetch_one
 from services.exceptions import LessonError, UserError
-from services.utils import Lesson, Subscription, UserID
+from services.utils import Lesson, Subscription, TLSubscription, UserID
 
 
 def update_where_sql(table: str, set_val: str, conditions: str):
@@ -69,6 +69,15 @@ async def fetch_one_subscription_where_cond(
     sql = select_where("subscription", "*", conditions)
     row = await fetch_one(sql, params)
     return Subscription(**row) if row is not None else None
+
+
+async def fetch_one_group_subscription_where_cond(
+    conditions: str,
+    params: Iterable[Any],
+) -> TLSubscription | None:
+    sql = select_where("tl_subscription", "*", conditions)
+    row = await fetch_one(sql, params)
+    return TLSubscription(**row) if row is not None else None
 
 
 async def get_user_by_tg_id(telegram_id: int):

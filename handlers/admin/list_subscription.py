@@ -10,7 +10,7 @@ from config import (
     SUB_INDIVIDUAL_CODE,
 )
 from handlers.response import edit_callbackquery_template
-from services.admin.kb import get_type_subscription_keyboard
+from services.kb import get_type_subscription_keyboard
 from services.admin.list_subscription import (
     delete_group_subscription,
     delete_individual_subscription,

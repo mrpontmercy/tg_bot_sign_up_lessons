@@ -2,8 +2,9 @@ import logging
 import sqlite3
 from telegram import Update
 from telegram.ext import ContextTypes
+from config import LEN_GROUP_SUB_KEY, LEN_INDIVIDUAL_SUB_KEY
 from handlers.response import send_error_message, send_template_message
-from services.admin.kb import get_type_subscription_keyboard
+from services.kb import get_type_subscription_keyboard
 from services.admin.subscription import (
     add_group_subscription_to_db,
     add_individual_subscription_to_db,
@@ -44,7 +45,7 @@ async def start_generating_individual_subscription(
 ):
     query = update.callback_query
     await query.answer()
-    sub_key = await generate_sub_key(20)
+    sub_key = await generate_sub_key(LEN_INDIVIDUAL_SUB_KEY)
 
     context.user_data["sub_key"] = sub_key
     back_kb = get_back_keyboard(InterimAdminState.BACK_TO_ADMIN)
@@ -114,7 +115,7 @@ async def start_generating_group_subscription(
 ):
     query = update.callback_query
     await query.answer()
-    sub_key = await generate_sub_key(20)
+    sub_key = await generate_sub_key(LEN_GROUP_SUB_KEY)
 
     context.user_data["sub_key"] = sub_key
     back_kb = get_back_keyboard(InterimAdminState.BACK_TO_ADMIN)

@@ -27,6 +27,7 @@ class InterimAdminState(Enum):
 class StartState(Enum):
     SHOWING = auto()
     CHOOSE_ACTION = auto()
+    CHOOSE_SUBSCRIPTION = auto()
     ACTIVATE_SUBSCRIPTION = auto()
     REGISTRATION = auto()
     ACTIVETE_SUBSCRIPTION = auto()

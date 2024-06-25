@@ -1,7 +1,3 @@
-from config import (
-    CALLBACK_DATA_GROUP_SUBSCRIPTION,
-    CALLBACK_DATA_INDIVIDUAL_SUBSCRIPTION,
-)
 from services.states import END, InterimAdminState
 
 
@@ -36,23 +32,4 @@ def get_admin_keyboard():
         [InlineKeyboardButton("Завершить", callback_data=str(END))],
     ]
 
-    return InlineKeyboardMarkup(buttons)
-
-
-def get_type_subscription_keyboard(back_button_state):
-    buttons = [
-        [
-            InlineKeyboardButton(
-                "Индивидуальная(Бессрочная)",
-                callback_data=CALLBACK_DATA_INDIVIDUAL_SUBSCRIPTION,
-            ),
-        ],
-        [
-            InlineKeyboardButton(
-                "Групповая(Временная)",
-                callback_data=CALLBACK_DATA_GROUP_SUBSCRIPTION,
-            )
-        ],
-        [InlineKeyboardButton("Назад", callback_data=str(back_button_state))],
-    ]
     return InlineKeyboardMarkup(buttons)
