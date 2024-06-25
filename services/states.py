@@ -34,8 +34,11 @@ class StartState(Enum):
 
 class AdminState(Enum):
     CHOOSE_ACTION = auto()
-    GENERATE_SUB = auto()
+    GENERATING_SUBSCRIPTION = auto()
+    GENERATE_INDIVIDUAL_SUB = auto()
+    GENERATE_GROUP_SUB = auto()
     ADD_LECTURER = auto()
+    UPDATING_LESSONS = auto()
     INSERT_GROUP_LESSONS = auto()
     INSERT_INDIVIDUAL_LESSONS = auto()
 

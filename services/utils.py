@@ -16,6 +16,7 @@ PHONE_NUMBER_PATTERN = r"^[8][0-9]{10}$"  # Для российских номе
 FS_NAME_PATTERN = r"^[a-zA-Zа-яёА-ЯЁ]{3,}$"
 EMAIL_PATTERN = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
 DATE_TIME_PATTERN = r"^\d{4}-(0?[1-9]|1[0-2])-(0?[1-9]|[12]\d|3[01]) (0?[0-9]|1[0-9]|2[0-3]):([0-5][0-9])$"
+DATE_PATTERN = r"^\d{4}-(0?[1-9]|1[0-2])-(0?[1-9]|[12]\d|3[01])"
 URL_PATTERN = r"^(https:|http).*$"  # Очень упрощенный вариант
 
 
@@ -69,6 +70,26 @@ class Subscription:
             "id": self.id,
             "sub_key": self.sub_key,
             "num_of_classes": self.num_of_classes,
+            "user_id": self.user_id,
+        }
+
+
+@dataclass
+class TLSubscription:
+    id: int
+    sub_key: int
+    num_of_classes: int
+    start_date: str
+    end_date: str
+    user_id: int | None
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "sub_key": self.sub_key,
+            "num_of_classes": self.num_of_classes,
+            "start_date": self.start_date,
+            "end_date": self.end_date,
             "user_id": self.user_id,
         }
 

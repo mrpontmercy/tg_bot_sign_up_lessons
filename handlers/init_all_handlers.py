@@ -11,10 +11,16 @@ from config import (
     CALLBACK_DATA_DELETELESSON_ADMIN,
     CALLBACK_DATA_DELETESUBSCRIPTION,
     CALLBACK_DATA_GROUP_LESSON,
+    CALLBACK_DATA_GROUP_LESSON_PREFIX,
+    CALLBACK_DATA_GROUP_SUBSCRIPTION,
+    CALLBACK_DATA_GROUP_SUBSCRIPTION_PREFIX,
     CALLBACK_DATA_INDIVIDUAL_LESSON,
+    CALLBACK_DATA_INDIVIDUAL_LESSON_PREFIX,
+    CALLBACK_DATA_INDIVIDUAL_SUBSCRIPTION,
+    CALLBACK_DATA_INDIVIDUAL_SUBSCRIPTION_PREFIX,
     CALLBACK_DATA_SUBSCRIBE_TO_LESSON,
     CALLBACK_LESSON_PREFIX,
-    CALLBACK_SUB_PREFIX,
+    CALLBACK_SUBSCRIPTION_PREFIX,
     CALLBACK_USER_LESSON_PREFIX,
 )
 from handlers.admin.admin import (
@@ -34,17 +40,26 @@ from handlers.admin.edit_lesson import (
     start_edit_title_lesson,
 )
 from handlers.admin.list_lessons import (
-    all_lessons_button_admin,
+    all_group_lessons_button_admin,
+    all_individual_lessons_button_admin,
     return_to_lessons_admin,
-    show_all_lessons_admin,
+    show_all_group_lessons_admin,
+    show_all_individual_lessons_admin,
+    start_show_lessons_admin,
 )
 from handlers.admin.list_subscription import (
-    list_available_subs_admin,
-    list_subs_button_admin,
+    list_available_group_subs_admin,
+    list_available_individual_subs_admin,
+    list_group_subs_button_admin,
+    list_individual_subs_button_admin,
+    show_type_subscription,
 )
 from handlers.admin.make_lecturer import enter_lecturer_phone_number, make_lecturer
 from handlers.admin.subscription import (
-    make_new_subscription,
+    make_new_group_subscription,
+    make_new_individual_subscription,
+    start_generating_group_subscription,
+    start_generating_individual_subscription,
     start_generating_subscription,
 )
 from handlers.admin.upload_lessons import (
@@ -80,6 +95,7 @@ from services.states import (
     StopState,
     SwitchState,
 )
+
 
 CQH_CONFIRM_SUBSCRIBE = CallbackQueryHandler(
     confirmation_action_handler,
@@ -163,14 +179,27 @@ START_CHOOSE_ACTION_HANDLERS = [
 LIST_SUBS_CONV_HANDLER = ConversationHandler(
     [
         CallbackQueryHandler(
-            list_available_subs_admin,
+            show_type_subscription,
             pattern=f"^{InterimAdminState.LIST_AVAILABLE_SUBS}$",
         )
     ],
     states={
         SwitchState.CHOOSE_ACTION: [
             CallbackQueryHandler(
-                list_subs_button_admin, pattern="^" + CALLBACK_SUB_PREFIX + "\d+"
+                list_available_individual_subs_admin,
+                pattern=f"^{CALLBACK_DATA_INDIVIDUAL_SUBSCRIPTION}$",
+            ),
+            CallbackQueryHandler(
+                list_available_group_subs_admin,
+                pattern=f"^{CALLBACK_DATA_GROUP_SUBSCRIPTION}$",
+            ),
+            CallbackQueryHandler(
+                list_individual_subs_button_admin,
+                pattern="^" + CALLBACK_DATA_INDIVIDUAL_SUBSCRIPTION_PREFIX + "\d+",
+            ),
+            CallbackQueryHandler(
+                list_group_subs_button_admin,
+                pattern="^" + CALLBACK_DATA_GROUP_SUBSCRIPTION_PREFIX + "\d+",
             ),
             *CONFIRMATION_HANDLERS,
         ]
@@ -236,13 +265,27 @@ EDIT_LESSON_CONV_HANDLER_ADMIN = ConversationHandler(
 LIST_ALL_LESSONS_CONV_HANDLER_ADMIN = ConversationHandler(
     [
         CallbackQueryHandler(
-            show_all_lessons_admin, pattern=f"^{InterimAdminState.SHOW_ALL_LESSONS}$"
+            start_show_lessons_admin,
+            pattern=f"^{InterimAdminState.SHOW_ALL_LESSONS}$",
         )
     ],
     states={
         SwitchState.CHOOSE_ACTION: [
             CallbackQueryHandler(
-                all_lessons_button_admin, pattern="^" + CALLBACK_LESSON_PREFIX + "\d+"
+                all_group_lessons_button_admin,
+                pattern="^" + CALLBACK_DATA_GROUP_LESSON_PREFIX + "\d+",
+            ),
+            CallbackQueryHandler(
+                all_individual_lessons_button_admin,
+                pattern="^" + CALLBACK_DATA_INDIVIDUAL_LESSON_PREFIX + "\d+",
+            ),
+            CallbackQueryHandler(
+                show_all_group_lessons_admin,
+                pattern=f"^{CALLBACK_DATA_GROUP_LESSON}$",
+            ),
+            CallbackQueryHandler(
+                show_all_individual_lessons_admin,
+                pattern=f"^{CALLBACK_DATA_INDIVIDUAL_LESSON}$",
             ),
             EDIT_LESSON_CONV_HANDLER_ADMIN,
             *CONFIRMATION_HANDLERS,
@@ -271,17 +314,6 @@ ADMIN_CHOOSE_ACTION_HANDLERS = [
         start_inserting_lessons,
         pattern=f"^{InterimAdminState.START_UPDATE_LESSONS}$",
     ),
-    CallbackQueryHandler(
-        start_inserting_group_lessons, pattern=f"^{CALLBACK_DATA_GROUP_LESSON}$"
-    ),
-    CallbackQueryHandler(
-        start_inserting_individual_lessons,
-        pattern=f"^{CALLBACK_DATA_INDIVIDUAL_LESSON}$",
-    ),
-    # CallbackQueryHandler(
-    #     start_inserting_individual_lessons,
-    #     pattern=f"^{InterimAdminState.START_UPDATE_LESSONS}$",
-    # ),
     LIST_SUBS_CONV_HANDLER,
     LIST_ALL_LESSONS_CONV_HANDLER_ADMIN,
 ]
@@ -293,16 +325,41 @@ ADMIN_CONV_HANDLER = ConversationHandler(
     ],
     states={
         AdminState.CHOOSE_ACTION: ADMIN_CHOOSE_ACTION_HANDLERS,
+        AdminState.GENERATING_SUBSCRIPTION: [
+            CallbackQueryHandler(
+                start_generating_individual_subscription,
+                pattern=f"^{CALLBACK_DATA_INDIVIDUAL_SUBSCRIPTION}$",
+            ),
+            CallbackQueryHandler(
+                start_generating_group_subscription,
+                pattern=f"^{CALLBACK_DATA_GROUP_SUBSCRIPTION}$",
+            ),
+        ],
+        AdminState.UPDATING_LESSONS: [
+            CallbackQueryHandler(
+                start_inserting_group_lessons, pattern=f"^{CALLBACK_DATA_GROUP_LESSON}$"
+            ),
+            CallbackQueryHandler(
+                start_inserting_individual_lessons,
+                pattern=f"^{CALLBACK_DATA_INDIVIDUAL_LESSON}$",
+            ),
+        ],
         AdminState.ADD_LECTURER: [
             MessageHandler(
                 filters.TEXT & filters.Regex("^(?!\/stop$).+"),
                 make_lecturer,
             )
         ],
-        AdminState.GENERATE_SUB: [
+        AdminState.GENERATE_INDIVIDUAL_SUB: [
             MessageHandler(
                 filters.TEXT & filters.Regex("^(?!\/stop$).+"),
-                make_new_subscription,
+                make_new_individual_subscription,
+            )
+        ],
+        AdminState.GENERATE_GROUP_SUB: [
+            MessageHandler(
+                filters.TEXT & filters.Regex("^(?!\/stop$).+"),
+                make_new_group_subscription,
             )
         ],
         AdminState.INSERT_GROUP_LESSONS: [

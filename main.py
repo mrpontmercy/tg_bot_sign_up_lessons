@@ -5,9 +5,6 @@ from config import TELEGRAM_BOT_TOKEN
 from db import close_db
 from handlers.init_all_handlers import (
     ADMIN_CONV_HANDLER,
-    CQH_CONFIRM_SUBCRIBE_CANCEL,
-    CQH_CONFIRM_SUBCRIBE_YES,
-    CQH_CONFIRM_SUBSCRIBE,
     START_CONV_HANLER,
 )
 
@@ -26,9 +23,6 @@ def main():
     app = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
     app.add_handler(START_CONV_HANLER)
     app.add_handler(ADMIN_CONV_HANDLER)
-    # app.add_handlers(
-    #     [CQH_CONFIRM_SUBSCRIBE, CQH_CONFIRM_SUBCRIBE_YES, CQH_CONFIRM_SUBCRIBE_CANCEL]
-    # )
     app.run_polling(drop_pending_updates=True)
 
 

@@ -75,10 +75,11 @@ async def insert_lesson_in_db(params):
     )
 
 
-async def get_all_lessons_from_db(*args) -> list[Lesson]:
-    sql = """select l.id, l.title, l.time_start, l.num_of_seats, u.f_name || ' ' || u.s_name as lecturer_full_name, l.lecturer_id, l.lesson_link from lesson l
-            join user u on u.id=l.lecturer_id"""
-    rows = await fetch_all(sql)
+async def get_all_lessons_by_type_from_db(*, is_group: bool) -> list[Lesson]:
+    sql = """select l.id, l.title, l.time_start, l.num_of_seats, u.f_name || ' ' || u.s_name as lecturer_full_name, l.lecturer_id, l.lesson_link, l.is_group from lesson l
+            join user u on u.id=l.lecturer_id WHERE l.is_group=:is_group"""
+    params = {"is_group": is_group}
+    rows = await fetch_all(sql, params=params)
 
     if not rows:
         raise LessonError("Не удалось найти занятия")

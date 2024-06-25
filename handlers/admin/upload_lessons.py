@@ -27,7 +27,7 @@ async def start_inserting_lessons(update: Update, _: ContextTypes.DEFAULT_TYPE):
         "Выберите какого типа уроки хотите добавить\n",
         reply_markup=choose_type_lesson_kb,
     )
-    return AdminState.CHOOSE_ACTION
+    return AdminState.UPDATING_LESSONS
 
 
 @add_message_info_into_context
