@@ -5,10 +5,10 @@ from typing import Callable
 
 from telegram import Update
 from telegram.ext import ContextTypes
+
 from db import execute, fetch_all
 from handlers.response import edit_callbackquery_template
 from services.exceptions import ColumnCSVError, LessonError
-from services.templates import render_template
 from services.utils import Lesson, TransientLesson
 
 
@@ -21,11 +21,6 @@ async def lessons_button(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
 ):
-    """
-    Ответить на колбекквери (чтобы кнопка не отображалась нажатой)
-    Получаем список всех уроков
-    Формируем новую клавиатуру
-    """
     query = update.callback_query
     await query.answer()
     current_index = int(query.data[len(pattern) :])
@@ -55,7 +50,7 @@ def get_lessons_from_file(
         reader = csv.DictReader(file, fieldnames)
         for row in reader:
             try:
-                l = TransientLesson(**row)
+                lesson = TransientLesson(**row)
             except (TypeError, KeyError, ColumnCSVError) as e:
                 logging.getLogger(__name__).exception(e)
                 return None
@@ -63,7 +58,7 @@ def get_lessons_from_file(
                 logging.getLogger(__name__).exception(e)
                 return None
             else:
-                lessons.append(l)
+                lessons.append(lesson)
 
     return lessons
 

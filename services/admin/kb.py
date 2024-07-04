@@ -1,7 +1,6 @@
-from services.states import END, InterimAdminState
-
-
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+
+from services.states import END, InterimAdminState
 
 
 def get_admin_keyboard():

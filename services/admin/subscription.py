@@ -1,14 +1,12 @@
 import re
 import string
+import random
 from typing import Any, Iterable
 
 import aiosqlite
+
 from db import execute, fetch_all, get_db
 from services.exceptions import InputMessageError, SubscriptionError
-
-
-import random
-
 from services.utils import DATE_PATTERN, Subscription
 
 
@@ -32,7 +30,7 @@ async def get_all_subs():
 async def generate_sub_key(k: int):
     try:
         subs = await get_all_subs()
-    except SubscriptionError as e:
+    except SubscriptionError:
         subs = []
         pass
 
@@ -52,7 +50,7 @@ def validate_group_subscription_input(message: str):
         )
     n, s, f = lst_message
     try:
-        num_of_seats = validate_num_of_classes(n.strip())
+        validate_num_of_classes(n.strip())
     except InputMessageError:
         raise
 
@@ -82,7 +80,7 @@ async def add_individual_subscription_to_db(params: Iterable[Any]):
             """insert into subscription (sub_key, num_of_classes) VALUES (:sub_key, :num_of_classes)""",
             params=params,
         )
-    except aiosqlite.Error as e:
+    except aiosqlite.Error:
         await (await get_db()).rollback()
         raise
 
@@ -93,6 +91,6 @@ async def add_group_subscription_to_db(params: Iterable[Any]):
             """insert into tl_subscription (sub_key, num_of_classes, start_date, end_date) VALUES (:sub_key, :num_of_classes, :start_date, :end_date)""",
             params=params,
         )
-    except aiosqlite.Error as e:
+    except aiosqlite.Error:
         await (await get_db()).rollback()
         raise

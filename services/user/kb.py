@@ -1,9 +1,8 @@
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+
 from services.db import get_user_by_tg_id
 from services.exceptions import UserError
 from services.states import END, InterimStartState
-
-
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 
 
 def get_non_register_keyboard():

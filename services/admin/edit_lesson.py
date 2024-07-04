@@ -1,14 +1,11 @@
 import re
+
 from telegram.ext import ContextTypes
 
 from handlers.response import send_error_message
 from services.admin.subscription import validate_num_of_classes
-from services.db import execute_update, get_all_users_of_lesson
+from services.db import execute_update
 from services.exceptions import InputMessageError
-from services.notification import (
-    notify_users_and_lecturer_changing_lesson,
-    notify_users_changing_lesson,
-)
 from services.utils import DATE_TIME_PATTERN, URL_PATTERN, Lesson
 
 

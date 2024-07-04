@@ -1,5 +1,6 @@
 from datetime import datetime
 from sqlite3 import Error
+
 from config import (
     LEN_GROUP_SUB_KEY,
     LEN_INDIVIDUAL_SUB_KEY,

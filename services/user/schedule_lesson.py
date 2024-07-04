@@ -1,12 +1,11 @@
 from datetime import datetime, timedelta, timezone
 from sqlite3 import Error
+
 from config import DATETIME_FORMAT
 from db import fetch_all, get_db
 from services.db import execute_delete, execute_update
-from services.exceptions import LessonError, SubscriptionError
-from services.user.lesson import is_active_group_subscription
-from services.user.subscription import get_user_subscription
-from services.utils import Lesson, Subscription, TLSubscription, UserID
+from services.exceptions import LessonError
+from services.utils import Lesson, Subscription, TLSubscription
 
 
 async def fetch_all_user_upcoming_lessons(user_id: str | int, is_group: bool):
@@ -78,7 +77,7 @@ async def update_individual_lesson_after_cancel(
             {"user_id": user_id, "lesson_id": lesson.id},
             autocommit=False,
         )
-    except Error as e:
+    except Error:
         await (await get_db()).rollback()
         raise
 

@@ -1,10 +1,12 @@
 from datetime import datetime
 from sqlite3 import Error
+
 from telegram.ext import ContextTypes
+
 from db import fetch_all, fetch_one, get_db
 from services.db import execute_insert, execute_update, get_user_by_tg_id, select_where
 from services.exceptions import LessonError, SubscriptionError, UserError
-from services.utils import DATE_PATTERN, Lesson, Subscription, TLSubscription
+from services.utils import Lesson, Subscription, TLSubscription
 
 
 async def get_available_upcoming_lessons_by_type_from_db(user_id: int, is_group: bool):
@@ -86,7 +88,7 @@ async def sub_to_individual_lesson(lesson: Lesson, sub: Subscription):
             },
             autocommit=False,
         )
-    except Error as e:
+    except Error:
         await (await get_db()).rollback()
         raise
     await (await get_db()).commit()

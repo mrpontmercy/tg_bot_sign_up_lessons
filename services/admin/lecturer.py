@@ -1,8 +1,7 @@
+import re
+
 from services.exceptions import InputMessageError
 from services.utils import PHONE_NUMBER_PATTERN
-
-
-import re
 
 
 def validate_phone_number(message: str):

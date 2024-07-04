@@ -1,4 +1,5 @@
 from typing import Any, Iterable
+
 from config import LECTURER_STATUS
 from db import execute, fetch_all, fetch_one
 from services.exceptions import LessonError, UserError

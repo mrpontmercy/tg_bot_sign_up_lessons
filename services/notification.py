@@ -1,5 +1,6 @@
 from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
+
 from services.db import get_all_users_of_lesson
 from services.templates import render_template
 

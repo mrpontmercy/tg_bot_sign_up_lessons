@@ -1,15 +1,12 @@
-from telegram import Update
-from telegram.ext import ContextTypes
-from handlers.response import edit_callbackquery_template, send_error_message
-from services.admin.kb import get_admin_keyboard
-from services.db import get_user_by_tg_id
-from services.exceptions import UserError
-from services.filters import is_admin
-from services.states import END, AdminState, StartState
-
-
 from functools import wraps
 
+from telegram import Update
+from telegram.ext import ContextTypes
+
+from handlers.response import edit_callbackquery_template, send_error_message
+from services.admin.kb import get_admin_keyboard
+from services.filters import is_admin
+from services.states import END, AdminState, StartState
 from services.user.kb import get_current_user_keyboard
 
 

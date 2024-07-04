@@ -1,5 +1,6 @@
 import re
 from typing import Any, Iterable
+
 from services.db import execute_insert
 from services.exceptions import (
     ValidationEmailError,

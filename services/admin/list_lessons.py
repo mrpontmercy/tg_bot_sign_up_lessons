@@ -1,12 +1,11 @@
 import logging
 from sqlite3 import Error
-from typing import Literal
 
 from telegram.ext import ContextTypes
+
 from config import SUB_GROUP_CODE, SUB_INDIVIDUAL_CODE
 from db import get_db
 from services.db import execute_delete, execute_update, get_all_users_of_lesson
-from services.notification import notify_users_and_lecturer_changing_lesson
 from services.utils import Lesson
 
 

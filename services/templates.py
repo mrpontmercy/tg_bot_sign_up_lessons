@@ -1,4 +1,3 @@
-from typing import Any
 import jinja2
 
 from config import TEMPLATE_DIR
