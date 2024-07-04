@@ -1,12 +1,12 @@
 import logging
 import sqlite3
+
 from telegram import Update
 from telegram.ext import ContextTypes
 
 from config import (
     CALLBACK_DATA_GROUP_LESSON_PREFIX,
     CALLBACK_DATA_INDIVIDUAL_LESSON_PREFIX,
-    CALLBACK_LESSON_PREFIX,
     SUB_GROUP_CODE,
     SUB_INDIVIDUAL_CODE,
 )
@@ -19,7 +19,7 @@ from services.kb import (
     get_type_lesson_keyboard,
 )
 from services.lesson import lessons_button
-from services.states import InterimStartState, StartState, SwitchState
+from services.states import InterimStartState, SwitchState
 from services.user.lesson import (
     get_available_upcoming_lessons_by_type_from_db,
     get_lessons,
@@ -31,10 +31,6 @@ from services.utils import Lesson, add_start_over
 
 @add_start_over
 async def start_show_lessons(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """
-    Получить список всех доступных уроков, на которые пользователь еще не записан! (сортировать по дате начала занятия)
-    Отобразить первый урок, добавить клавиатуру
-    """
     query = update.callback_query
     await query.answer()
 
@@ -51,10 +47,6 @@ async def start_show_lessons(update: Update, context: ContextTypes.DEFAULT_TYPE)
 async def show_available_individual_lessons(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ):
-    """
-    Получить список всех доступных индивидуальных занятий, на которые пользователь еще не записан! (сортировать по дате начала занятия)
-    Отобразить первый урок, добавить клавиатуру
-    """
     query = update.callback_query
     await query.answer()
 
@@ -124,10 +116,6 @@ async def available_individual_lessons_button(
 async def show_available_group_lessons(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ):
-    """
-    Получить список всех доступных индивидуальных занятий, на которые пользователь еще не записан! (сортировать по дате начала занятия)
-    Отобразить первый урок, добавить клавиатуру
-    """
     query = update.callback_query
     await query.answer()
 
@@ -194,13 +182,6 @@ async def available_group_lessons_button(
 
 
 async def subscribe_to_lesson(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """
-    Узнаем, зарегестрирован ли текущий пользователь (если нет отправляем регистрироваться)
-    Узнаем есть ли у пользователя подписка (если есть, то узнать сколько занятий осталось)(если нету, предложить оформить)
-    ОБновляем значение оставшихся занятий у пользователя
-    Уменьшаем количество доступных мест у занятия
-    Записываем в M2M информацию о пользователе и занятии
-    """
     query = update.callback_query
     await query.answer()
     user_tg_id = update.effective_user.id

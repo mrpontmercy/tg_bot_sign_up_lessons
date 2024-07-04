@@ -9,9 +9,8 @@ from services.admin.edit_lesson import (
     change_lesson_time_start,
     change_lesson_title,
 )
-from services.db import get_user_by_tg_id
 from services.kb import get_back_keyboard, get_edit_lesson_keyboard
-from services.states import EditLesson, InterimAdminState, InterimEditLesson
+from services.states import EditLesson, InterimEditLesson
 from services.templates import render_template
 from services.utils import (
     Lesson,
@@ -23,8 +22,6 @@ from services.utils import (
 async def start_edit_lesson(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-
-    user_tg_id = update.effective_user.id
 
     curr_lesson: Lesson | None = context.user_data.get("curr_lesson")
     back_kb = get_back_keyboard(EditLesson.RETURN_PREV_CONV)

@@ -1,14 +1,14 @@
 import logging
 import sqlite3
+
 from telegram import Update, User
 from telegram.ext import ContextTypes
 
-from handlers.response import edit_callbackquery_template, send_template_message
-from services.user.kb import get_current_user_keyboard
+from handlers.response import edit_callbackquery_template
 from services.exceptions import ValidationError
 from services.kb import get_back_keyboard, get_retry_or_back_keyboard
 from services.user.registration import insert_user, validate_message
-from services.states import END, InterimStartState, StartState
+from services.states import InterimStartState, StartState
 from services.utils import (
     add_message_info_into_context,
     add_start_over,

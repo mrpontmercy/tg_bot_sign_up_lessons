@@ -1,5 +1,9 @@
 import logging
 import sqlite3
+
+from telegram import Update
+from telegram.ext import ContextTypes
+
 from handlers.response import send_error_message
 from services.admin.lecturer import validate_phone_number
 from services.db import get_user_by_phone_number, update_user_to_lecturer
@@ -11,10 +15,6 @@ from services.utils import (
     add_message_info_into_context,
     delete_last_message_from_context,
 )
-
-
-from telegram import Update
-from telegram.ext import ContextTypes
 
 
 @add_message_info_into_context

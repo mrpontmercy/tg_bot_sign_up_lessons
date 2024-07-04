@@ -1,11 +1,11 @@
 import sqlite3
+
 from telegram import Update
 from telegram.ext import ContextTypes
 
 from config import (
     CALLBACK_DATA_GROUP_SUBSCRIPTION_PREFIX,
     CALLBACK_DATA_INDIVIDUAL_SUBSCRIPTION_PREFIX,
-    CALLBACK_SUBSCRIPTION_PREFIX,
     SUB_GROUP_CODE,
     SUB_INDIVIDUAL_CODE,
 )

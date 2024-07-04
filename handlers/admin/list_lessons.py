@@ -1,20 +1,17 @@
 from sqlite3 import Error
+
 from telegram import Update
 from telegram.ext import ContextTypes
 
 from config import (
-    CALLBACK_DATA_GROUP_LESSON,
     CALLBACK_DATA_GROUP_LESSON_PREFIX,
-    CALLBACK_DATA_INDIVIDUAL_LESSON,
     CALLBACK_DATA_INDIVIDUAL_LESSON_PREFIX,
-    CALLBACK_LESSON_PREFIX,
 )
 from handlers.response import edit_callbackquery_template
 from services.admin.list_lessons import (
     process_delete_lesson_admin,
-    process_delete_lesson_db,
 )
-from services.db import get_user_by_id, get_user_by_tg_id
+from services.db import get_user_by_tg_id
 from services.decorators import admin_required
 from services.exceptions import LessonError, UserError
 from services.kb import (
@@ -23,8 +20,7 @@ from services.kb import (
     get_type_lesson_keyboard,
 )
 from services.lesson import lessons_button, get_all_lessons_by_type_from_db
-from services.states import END, InterimAdminState, StopState, SwitchState
-from services.user.lesson import get_lessons
+from services.states import InterimAdminState, StopState, SwitchState
 from services.utils import Lesson
 
 
@@ -37,8 +33,6 @@ async def start_show_lessons_admin(update: Update, context: ContextTypes.DEFAULT
 
     query = update.callback_query
     await query.answer()
-
-    user_tg_id = update.effective_user.id
 
     type_lesson_kb = get_type_lesson_keyboard(SwitchState.RETURN_PREV_CONV)
 
@@ -97,7 +91,7 @@ async def all_group_lessons_button_admin(
 ):
     try:
         tg_id = context.user_data.get("curr_user_tg_id")
-        user = await get_user_by_tg_id(tg_id)
+        await get_user_by_tg_id(tg_id)
         lessons = await get_all_lessons_by_type_from_db(is_group=True)
     except (UserError, LessonError) as e:
         await edit_callbackquery_template(
@@ -169,7 +163,7 @@ async def all_individual_lessons_button_admin(
 ):
     try:
         tg_id = context.user_data.get("curr_user_tg_id")
-        user = await get_user_by_tg_id(tg_id)
+        await get_user_by_tg_id(tg_id)
         lessons = await get_all_lessons_by_type_from_db(is_group=False)
     except (UserError, LessonError) as e:
         await edit_callbackquery_template(
@@ -195,7 +189,6 @@ async def all_individual_lessons_button_admin(
 
 @admin_required
 async def delete_lesson_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    tg_id = context.user_data.get("curr_user_tg_id")
 
     curr_lesson = context.user_data.get("curr_lesson")
     back_kb = get_back_keyboard(InterimAdminState.SHOW_ALL_LESSONS)
@@ -203,7 +196,7 @@ async def delete_lesson_admin(update: Update, context: ContextTypes.DEFAULT_TYPE
     if curr_lesson:
         try:
             result_message = await process_delete_lesson_admin(curr_lesson, context)
-        except Error as e:
+        except Error:
             await edit_callbackquery_template(
                 update.callback_query,
                 "error.jinja",

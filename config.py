@@ -1,8 +1,8 @@
 import os
 from pathlib import Path
-import dotenv
+from dotenv import load_dotenv
 
-dotenv.load_dotenv()
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent
 

@@ -1,7 +1,9 @@
 import logging
 import sqlite3
+
 from telegram import Update
 from telegram.ext import ContextTypes
+
 from config import LEN_GROUP_SUB_KEY, LEN_INDIVIDUAL_SUB_KEY
 from handlers.response import (
     edit_callbackquery_template,
@@ -53,9 +55,7 @@ async def start_generating_individual_subscription(
 
     context.user_data["sub_key"] = sub_key
     back_kb = get_back_keyboard(InterimAdminState.BACK_TO_ADMIN)
-    answer = (
-        f"Отлично, теперь введите количество занятий для индивидуального абонемента!"
-    )
+    answer = "Отлично, теперь введите количество занятий для индивидуального абонемента!"
     await query.edit_message_text(answer, reply_markup=back_kb)
     return AdminState.GENERATE_INDIVIDUAL_SUB
 
@@ -169,7 +169,7 @@ async def make_new_group_subscription(
         )
         return AdminState.CHOOSE_ACTION
 
-    res_message = await send_template_message(
+    await send_template_message(
         tg_id,
         "create_subscription_success.jinja",
         context=context,

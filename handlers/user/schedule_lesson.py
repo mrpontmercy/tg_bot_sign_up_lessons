@@ -1,12 +1,12 @@
 import logging
 import sqlite3
+
 from telegram import Update
 from telegram.ext import ContextTypes
 
 from config import (
     CALLBACK_DATA_GROUP_LESSON_PREFIX,
     CALLBACK_DATA_INDIVIDUAL_LESSON_PREFIX,
-    CALLBACK_USER_LESSON_PREFIX,
     SUB_GROUP_CODE,
     SUB_INDIVIDUAL_CODE,
 )
@@ -34,12 +34,6 @@ from services.utils import Lesson, add_start_over
 async def start_show_schedule_lessons(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ):
-    """
-    Отображать уроки, на которые записан пользователь
-
-    узнать есть ли пользователь в бд
-    узнать есть ли у него уроки
-    """
     query = update.callback_query
     await query.answer()
 
@@ -55,12 +49,6 @@ async def start_show_schedule_lessons(
 async def show_schedule_individual_lessons(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ):
-    """
-    Отображать уроки, на которые записан пользователь
-
-    узнать есть ли пользователь в бд
-    узнать есть ли у него уроки
-    """
     query = update.callback_query
     await query.answer()
 
@@ -186,13 +174,6 @@ async def schedule_group_lessons_button(
 
 
 async def cancel_lesson(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """
-    отменять не поздее чем за 2 часа до занятия
-
-    Обновить информацию в таблице lesson
-    обновить количество уроков в абонементе
-    удалить строчку из user_lesson
-    """
     query = update.callback_query
     await query.answer()
 

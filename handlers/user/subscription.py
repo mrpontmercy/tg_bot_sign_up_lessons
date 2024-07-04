@@ -1,7 +1,9 @@
 import logging
 import sqlite3
+
 from telegram import Update
 from telegram.ext import ContextTypes
+
 from config import SUB_GROUP_CODE, SUB_INDIVIDUAL_CODE
 from handlers.response import edit_callbackquery_template, send_error_message
 from services.db import get_user_by_tg_id
@@ -16,7 +18,7 @@ from services.kb import (
     get_retry_or_back_keyboard,
     get_type_subscription_keyboard,
 )
-from services.states import END, InterimStartState, StartState
+from services.states import InterimStartState, StartState
 from services.user.subscription import (
     activate_subscription_by_key,
     get_user_subscription,
@@ -60,7 +62,9 @@ async def register_sub_key_to_user(update: Update, context: ContextTypes.DEFAULT
     user_tg_id = context.user_data.get("curr_user_tg_id")
 
     if user_tg_id is None:
-        await send_error_message(user_tg_id, context, err=str(e), keyboard=retry_kb)
+        await send_error_message(
+            user_tg_id, context, err="Не удалось найти пользователя", keyboard=retry_kb
+        )
         return StartState.CHOOSE_ACTION
     try:
         args = validate_args(mess_args)
@@ -94,7 +98,6 @@ async def register_sub_key_to_user(update: Update, context: ContextTypes.DEFAULT
 async def show_remainder_of_subscription(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ):
-    back_kb = get_back_keyboard(InterimStartState.BACK_TO_START)
     query = update.callback_query
     await query.answer()
 
