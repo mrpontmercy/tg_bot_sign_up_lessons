@@ -1,6 +1,6 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
-from services.states import END, InterimAdminState
+from services.states import END, InterimAdminState, SwitchState, UploadLessonsState
 
 
 def get_admin_keyboard():
@@ -18,10 +18,10 @@ def get_admin_keyboard():
         [
             InlineKeyboardButton(
                 "Обновить уроки",
-                callback_data=str(InterimAdminState.START_UPDATE_LESSONS),
+                callback_data=str(UploadLessonsState.START_UPDATING_LESSONS),
             ),
             InlineKeyboardButton(
-                "Все уроки", callback_data=str(InterimAdminState.SHOW_ALL_LESSONS)
+                "Все уроки", callback_data=str(SwitchState.START_SHOW_RESOURCES)
             ),
             InlineKeyboardButton(
                 "Добавить преподователя",

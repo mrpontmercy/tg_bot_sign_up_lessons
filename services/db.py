@@ -107,10 +107,15 @@ async def get_users_by_id(user_ids: list[int]):
     return [UserID(**row) for row in rows]
 
 
-async def get_lecturer_upcomming_lessons(lecturer_id: int):
-    sql = """select l.id, l.title, l.time_start, l.num_of_seats, u.f_name || ' ' || u.s_name as lecturer_full_name, l.lecturer_id FROM lesson l
-            join user u on u.id=l.lecturer_id WHERE l.lecturer_id=:lecturer_id AND strftime("%Y-%m-%d %H:%M", "now", "4 hours") < l.time_start ORDER BY l.time_start"""
-    rows = await fetch_all(sql, {"lecturer_id": lecturer_id})
+async def get_lecturer_upcomming_lessons(lecturer_id: int, is_group: bool = True):
+    sql = """select l.id, l.title, l.time_start, l.num_of_seats, u.f_name || ' ' || u.s_name as lecturer_full_name, l.lecturer_id, l.is_group FROM lesson l
+            join user u on u.id=l.lecturer_id WHERE l.lecturer_id=:lecturer_id AND strftime("%Y-%m-%d %H:%M", "now", "4 hours") < l.time_start ORDER BY l.time_start
+            and l.is_group=:is_group"""
+    params = {
+        "lecturer_id": lecturer_id,
+        "is_group": is_group,
+    }
+    rows = await fetch_all(sql, params=params)
 
     if not rows:
         raise LessonError("Не удалось найти занятия!")

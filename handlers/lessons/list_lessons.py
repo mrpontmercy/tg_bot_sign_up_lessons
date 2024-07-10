@@ -4,16 +4,18 @@ from telegram import Update
 from telegram.ext import ContextTypes
 
 from config import (
+    ADMIN_STATUS,
     CALLBACK_DATA_GROUP_LESSON_PREFIX,
     CALLBACK_DATA_INDIVIDUAL_LESSON_PREFIX,
+    LECTURER_STATUS,
 )
 from handlers.response import edit_callbackquery_template
 from services.admin.list_lessons import (
     process_delete_lesson_admin,
 )
-from services.db import get_user_by_tg_id
-from services.decorators import admin_required
+from services.db import get_lecturer_upcomming_lessons, get_user_by_tg_id
 from services.exceptions import LessonError, UserError
+from services.filters import is_admin
 from services.kb import (
     get_back_keyboard,
     get_flip_edit_delete_back_keyboard,
@@ -24,13 +26,7 @@ from services.states import InterimAdminState, StopState, SwitchState
 from services.utils import Lesson
 
 
-@admin_required
-async def start_show_lessons_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """
-    Получить список всех доступных уроков, на которые пользователь еще не записан! (сортировать по дате начала занятия)
-    Отобразить первый урок, добавить клавиатуру
-    """
-
+async def start_show_lessons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
 
@@ -43,26 +39,23 @@ async def start_show_lessons_admin(update: Update, context: ContextTypes.DEFAULT
     return SwitchState.CHOOSE_ACTION
 
 
-@admin_required
-async def show_all_group_lessons_admin(
-    update: Update, context: ContextTypes.DEFAULT_TYPE
-):
-    """
-    Получить список всех доступных уроков, на которые пользователь еще не записан! (сортировать по дате начала занятия)
-    Отобразить первый урок, добавить клавиатуру
-    """
+async def show_all_group_lessons(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     query = update.callback_query
     await query.answer()
 
     user_tg_id = update.effective_user.id
-
     context.user_data["curr_user_tg_id"] = user_tg_id
 
-    back_kb = get_back_keyboard(InterimAdminState.SHOW_ALL_LESSONS)
+    back_kb = get_back_keyboard(SwitchState.START_SHOW_RESOURCES)
     try:
-        lessons = await get_all_lessons_by_type_from_db(is_group=True)
-    except LessonError as e:
+        user = await get_user_by_tg_id(user_tg_id)
+        user_is_admin = is_admin(user_tg_id)
+        if user_is_admin:
+            lessons = await get_all_lessons_by_type_from_db(is_group=True)
+        elif not user_is_admin and user.status == LECTURER_STATUS:
+            lessons = await get_lecturer_upcomming_lessons(user.id, is_group=True)
+    except (LessonError, UserError) as e:
         await edit_callbackquery_template(
             query, "error.jinja", err=str(e), keyboard=back_kb
         )
@@ -73,7 +66,7 @@ async def show_all_group_lessons_admin(
         0,
         len(lessons),
         CALLBACK_DATA_GROUP_LESSON_PREFIX,
-        str(InterimAdminState.SHOW_ALL_LESSONS),
+        str(SwitchState.START_SHOW_RESOURCES),
     )
     await edit_callbackquery_template(
         query,
@@ -85,20 +78,21 @@ async def show_all_group_lessons_admin(
     return SwitchState.CHOOSE_ACTION
 
 
-@admin_required
-async def all_group_lessons_button_admin(
-    update: Update, context: ContextTypes.DEFAULT_TYPE
-):
+async def all_group_lessons_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         tg_id = context.user_data.get("curr_user_tg_id")
-        await get_user_by_tg_id(tg_id)
-        lessons = await get_all_lessons_by_type_from_db(is_group=True)
+        user = await get_user_by_tg_id(tg_id)
+        user_is_admin = is_admin(tg_id)
+        if user_is_admin:
+            lessons = await get_all_lessons_by_type_from_db(is_group=True)
+        elif not user_is_admin and user.status == LECTURER_STATUS:
+            lessons = await get_lecturer_upcomming_lessons(user.id, is_group=True)
     except (UserError, LessonError) as e:
         await edit_callbackquery_template(
             update.callback_query,
             "error.jinja",
             err=str(e),
-            keyboard=get_back_keyboard(InterimAdminState.SHOW_ALL_LESSONS),
+            keyboard=get_back_keyboard(SwitchState.START_SHOW_RESOURCES),
         )
         return SwitchState.CHOOSE_ACTION
 
@@ -107,7 +101,7 @@ async def all_group_lessons_button_admin(
         lessons=lessons,
         kb_func=kb_func,
         pattern=CALLBACK_DATA_GROUP_LESSON_PREFIX,
-        back_button_callbackdata=str(InterimAdminState.SHOW_ALL_LESSONS),
+        back_button_callbackdata=str(SwitchState.START_SHOW_RESOURCES),
         template_name="lesson.jinja",
         update=update,
         context=context,
@@ -115,8 +109,7 @@ async def all_group_lessons_button_admin(
     return SwitchState.CHOOSE_ACTION
 
 
-@admin_required
-async def show_all_individual_lessons_admin(
+async def show_all_individual_lessons(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ):
     """
@@ -131,9 +124,14 @@ async def show_all_individual_lessons_admin(
 
     context.user_data["curr_user_tg_id"] = user_tg_id
 
-    back_kb = get_back_keyboard(InterimAdminState.SHOW_ALL_LESSONS)
+    back_kb = get_back_keyboard(SwitchState.START_SHOW_RESOURCES)
     try:
-        lessons = await get_all_lessons_by_type_from_db(is_group=False)
+        user = await get_user_by_tg_id(user_tg_id)
+        user_is_admin = is_admin(user_tg_id)
+        if user_is_admin:
+            lessons = await get_all_lessons_by_type_from_db(is_group=False)
+        elif not user_is_admin and user.status == LECTURER_STATUS:
+            lessons = await get_lecturer_upcomming_lessons(user.id, is_group=False)
     except LessonError as e:
         await edit_callbackquery_template(
             query, "error.jinja", err=str(e), keyboard=back_kb
@@ -145,7 +143,7 @@ async def show_all_individual_lessons_admin(
         0,
         len(lessons),
         CALLBACK_DATA_INDIVIDUAL_LESSON_PREFIX,
-        str(InterimAdminState.SHOW_ALL_LESSONS),
+        str(SwitchState.START_SHOW_RESOURCES),
     )
     await edit_callbackquery_template(
         query,
@@ -157,20 +155,23 @@ async def show_all_individual_lessons_admin(
     return SwitchState.CHOOSE_ACTION
 
 
-@admin_required
-async def all_individual_lessons_button_admin(
+async def all_individual_lessons_button(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ):
     try:
         tg_id = context.user_data.get("curr_user_tg_id")
-        await get_user_by_tg_id(tg_id)
-        lessons = await get_all_lessons_by_type_from_db(is_group=False)
+        user = await get_user_by_tg_id(tg_id)
+        user_is_admin = is_admin(tg_id)
+        if user_is_admin:
+            lessons = await get_all_lessons_by_type_from_db(is_group=False)
+        elif not user_is_admin and user.status == LECTURER_STATUS:
+            lessons = await get_lecturer_upcomming_lessons(user.id, is_group=False)
     except (UserError, LessonError) as e:
         await edit_callbackquery_template(
             update.callback_query,
             "error.jinja",
             err=str(e),
-            keyboard=get_back_keyboard(InterimAdminState.SHOW_ALL_LESSONS),
+            keyboard=get_back_keyboard(SwitchState.START_SHOW_RESOURCES),
         )
         return SwitchState.CHOOSE_ACTION
 
@@ -179,7 +180,7 @@ async def all_individual_lessons_button_admin(
         lessons=lessons,
         kb_func=kb_func,
         pattern=CALLBACK_DATA_INDIVIDUAL_LESSON_PREFIX,
-        back_button_callbackdata=str(InterimAdminState.SHOW_ALL_LESSONS),
+        back_button_callbackdata=str(SwitchState.START_SHOW_RESOURCES),
         template_name="lesson.jinja",
         update=update,
         context=context,
@@ -187,15 +188,32 @@ async def all_individual_lessons_button_admin(
     return SwitchState.CHOOSE_ACTION
 
 
-@admin_required
-async def delete_lesson_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    curr_lesson = context.user_data.get("curr_lesson")
-    back_kb = get_back_keyboard(InterimAdminState.SHOW_ALL_LESSONS)
+async def delete_lesson(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    curr_lesson: Lesson = context.user_data.get("curr_lesson")
+    back_kb = get_back_keyboard(SwitchState.START_SHOW_RESOURCES)
+    user_tg_id = update.effective_user.id
 
     if curr_lesson:
         try:
-            result_message = await process_delete_lesson_admin(curr_lesson, context)
+            user = await get_user_by_tg_id(user_tg_id)
+            user_is_admin = is_admin(user_tg_id)
+            if curr_lesson.lecturer_id != user.id:
+                raise UserError("Это занятие не относится к вам!")
+            if user_is_admin:
+                status = ADMIN_STATUS
+            else:
+                status = LECTURER_STATUS
+            result_message = await process_delete_lesson_admin(
+                curr_lesson, context, status
+            )
+        except UserError as e:
+            await edit_callbackquery_template(
+                update.callback_query,
+                "error.jinja",
+                err=str(e),
+                keyboard=back_kb,
+            )
+            return SwitchState.CHOOSE_ACTION
         except Error:
             await edit_callbackquery_template(
                 update.callback_query,
@@ -212,10 +230,10 @@ async def delete_lesson_admin(update: Update, context: ContextTypes.DEFAULT_TYPE
     return SwitchState.CHOOSE_ACTION
 
 
-async def return_to_lessons_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def return_to_lessons(update: Update, context: ContextTypes.DEFAULT_TYPE):
     curr_lesson: Lesson | None = context.user_data.get("curr_lesson", None)
     if curr_lesson.is_group:
-        await show_all_group_lessons_admin(update, context)
+        await show_all_group_lessons(update, context)
     else:
-        await show_all_individual_lessons_admin(update, context)
+        await show_all_individual_lessons(update, context)
     return StopState.STOPPING

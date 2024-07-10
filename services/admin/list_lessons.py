@@ -3,9 +3,10 @@ from sqlite3 import Error
 
 from telegram.ext import ContextTypes
 
-from config import SUB_GROUP_CODE, SUB_INDIVIDUAL_CODE
+from config import ADMIN_STATUS, LECTURER_STATUS, SUB_GROUP_CODE, SUB_INDIVIDUAL_CODE
 from db import get_db
 from services.db import execute_delete, execute_update, get_all_users_of_lesson
+from services.notification import notify_users_changing_lesson
 from services.utils import Lesson
 
 
@@ -37,7 +38,7 @@ async def process_delete_lesson_db(lesson_id, sub_type: int):
 
 
 async def process_delete_lesson_admin(
-    lesson: Lesson, context: ContextTypes.DEFAULT_TYPE
+    lesson: Lesson, context: ContextTypes.DEFAULT_TYPE, status: str
 ):
     if lesson.is_group:
         sub_type = SUB_GROUP_CODE
@@ -59,9 +60,16 @@ async def process_delete_lesson_admin(
         "time_start": lesson.time_start,
         "lecturer": lesson.lecturer_full_name,
     }
-
-    # await notify_users_and_lecturer_changing_lesson(
-    #     "cancel_lesson_message.jinja", lesson.id, lesson.lecturer_id, data, context
-    # )
+    # if status == ADMIN_STATUS:
+    #     await notify_users_and_lecturer_changing_lesson(
+    #         "cancel_lesson_message.jinja", lesson.id, lesson.lecturer_id, data, context
+    #     )
+    # elif status == LECTURER_STATUS:
+    #     await notify_users_changing_lesson(
+    #         "cancel_lesson_by_lecturer.jinja",
+    #         lesson_id=lesson.id,
+    #         data=data,
+    #         context=context,
+    #     )
 
     return "Урок успешно отменен. "

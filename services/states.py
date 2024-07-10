@@ -50,11 +50,21 @@ class AdminState(Enum):
     INSERT_INDIVIDUAL_LESSONS = auto()
 
 
+class UploadLessonsState(Enum):
+    START_UPDATING_LESSONS = auto()
+    UPDATING_LESSONS = auto()
+    INSERT_INDIVIDUAL_LESSONS = auto()
+    INSERT_GROUP_LESSONS = auto()
+    RETURN_BACK = auto()
+    RETURN_PREV_CONV = auto()
+
+
 class LecturerState(Enum):
     CHOOSE_ACTION = auto()
 
 
 class SwitchState(Enum):
+    START_SHOW_RESOURCES = auto()
     CHOOSE_ACTION = auto()
     RETURN_PREV_CONV = auto()
 

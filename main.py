@@ -8,6 +8,7 @@ from handlers.admin.init_admin_handler import ADMIN_CONV_HANDLER
 from handlers.init_all_handlers import (
     START_CONV_HANLER,
 )
+from handlers.lecturer.init_lecturer_handler import LECTURER_CONV_HANDLER
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -24,6 +25,7 @@ def main():
     app = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
     app.add_handler(START_CONV_HANLER)
     app.add_handler(ADMIN_CONV_HANDLER)
+    app.add_handler(LECTURER_CONV_HANDLER)
     app.run_polling(drop_pending_updates=True)
 
 
