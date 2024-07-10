@@ -4,8 +4,8 @@ from telegram.ext import Application
 
 from config import TELEGRAM_BOT_TOKEN
 from db import close_db
+from handlers.admin.init_admin_handler import ADMIN_CONV_HANDLER
 from handlers.init_all_handlers import (
-    ADMIN_CONV_HANDLER,
     START_CONV_HANLER,
 )
 

@@ -62,6 +62,7 @@ db.sqlite3
 db.sqlite3-journal
 db.sql
 db_copy.sql
+db_copy_postgresql.sql
 db_test.sqlite3
 # Flask stuff:
 instance/

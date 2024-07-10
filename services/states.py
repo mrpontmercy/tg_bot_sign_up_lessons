@@ -25,6 +25,11 @@ class InterimAdminState(Enum):
     BACK_TO_ADMIN = auto()
 
 
+class InterimLecturerState(Enum):
+    SHOW_LECTURER_LESSONS = auto()
+    START_UPDATE_LESSONS = auto()
+
+
 class StartState(Enum):
     SHOWING = auto()
     CHOOSE_ACTION = auto()
@@ -43,6 +48,10 @@ class AdminState(Enum):
     UPDATING_LESSONS = auto()
     INSERT_GROUP_LESSONS = auto()
     INSERT_INDIVIDUAL_LESSONS = auto()
+
+
+class LecturerState(Enum):
+    CHOOSE_ACTION = auto()
 
 
 class SwitchState(Enum):

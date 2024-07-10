@@ -2,7 +2,7 @@ import logging
 import sqlite3
 
 from telegram import Update
-from telegram.ext import ContextTypes
+from telegram.ext import CallbackQueryHandler, ContextTypes
 
 from config import (
     CALLBACK_DATA_CANCEL_LESSON,
@@ -108,3 +108,24 @@ async def cancel_action_button(update: Update, context: ContextTypes.DEFAULT_TYP
             await show_all_group_lessons_admin(update, context)
         else:
             await show_all_individual_lessons_admin(update, context)
+
+
+CQH_CONFIRM_SUBCRIBE_CANCEL = CallbackQueryHandler(
+    cancel_action_button, pattern=".*_cancel_action$"
+)
+CQH_CONFIRM_SUBCRIBE_YES = CallbackQueryHandler(
+    confirm_action_button, pattern=".*_confirm_action$"
+)
+CQH_CONFIRM_SUBSCRIBE = CallbackQueryHandler(
+    confirmation_action_handler,
+    pattern=(
+        f".*({CALLBACK_DATA_DELETESUBSCRIPTION}|{CALLBACK_DATA_SUBSCRIBE_TO_LESSON}|"
+        f"{CALLBACK_DATA_CANCEL_LESSON}|{CALLBACK_DATA_DELETELESSON_ADMIN})$"
+    ),
+)
+
+CONFIRMATION_HANDLERS = [
+    CQH_CONFIRM_SUBSCRIBE,
+    CQH_CONFIRM_SUBCRIBE_YES,
+    CQH_CONFIRM_SUBCRIBE_CANCEL,
+]
