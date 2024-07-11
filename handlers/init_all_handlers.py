@@ -167,6 +167,6 @@ START_CONV_HANLER = ConversationHandler(
             start_command, pattern=f"^{InterimStartState.BACK_TO_START}$"
         ),
         CallbackQueryHandler(stop, pattern=f"^{END}$"),
-        MessageHandler(filters.TEXT, alert_user_start),
+        MessageHandler(filters.TEXT & filters.COMMAND, alert_user_start),
     ],
 )

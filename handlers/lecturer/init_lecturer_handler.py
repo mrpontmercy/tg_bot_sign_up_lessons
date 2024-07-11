@@ -39,8 +39,13 @@ from handlers.lessons.upload_lessons import (
     start_inserting_individual_lessons,
     start_inserting_lessons,
 )
-from handlers.lecturer.lecturer_start_command import lecturer_command, return_to_lecturer
+from handlers.lecturer.lecturer_start_command import (
+    alert_user_lecturer,
+    lecturer_command,
+    return_to_lecturer,
+)
 from handlers.start import stop
+from services.decorators import lecturer_required
 from services.states import (
     END,
     EditLesson,
@@ -54,18 +59,19 @@ from services.states import (
 
 EDIT_LESSON_CHOOSE_ACTION_HANDLERS = [
     CallbackQueryHandler(
-        start_edit_title_lesson, pattern=f"^{InterimEditLesson.START_EDIT_TITLE}$"
+        lecturer_required(start_edit_title_lesson),
+        pattern=f"^{InterimEditLesson.START_EDIT_TITLE}$",
     ),
     CallbackQueryHandler(
-        start_edit_time_start_lesson,
+        lecturer_required(start_edit_time_start_lesson),
         pattern=f"^{InterimEditLesson.START_EDIT_TIMESTART}$",
     ),
     CallbackQueryHandler(
-        start_edit_num_of_seats_lesson,
+        lecturer_required(start_edit_num_of_seats_lesson),
         pattern=f"^{InterimEditLesson.START_EDIT_NUM_OF_SEATS}$",
     ),
     CallbackQueryHandler(
-        start_edit_lesson_link_lesson,
+        lecturer_required(start_edit_lesson_link_lesson),
         pattern=f"^{InterimEditLesson.START_EDIT_LESSON_LINK}$",
     ),
 ]
@@ -73,28 +79,39 @@ EDIT_LESSON_CHOOSE_ACTION_HANDLERS = [
 EDIT_LESSON_CONV_HANDLER_ADMIN = ConversationHandler(
     [
         CallbackQueryHandler(
-            start_edit_lesson,
+            lecturer_required(start_edit_lesson),
             pattern=f"^{InterimEditLesson.START_EDIT_LESSON}$",
         )
     ],
     states={
         EditLesson.CHOOSE_ACTION: EDIT_LESSON_CHOOSE_ACTION_HANDLERS,
         EditLesson.EDIT_TITLE: [
-            MessageHandler(filters.TEXT & ~filters.COMMAND, edit_title_lesson)
+            MessageHandler(
+                filters.TEXT & ~filters.COMMAND, lecturer_required(edit_title_lesson)
+            )
         ],
         EditLesson.EDIT_TIMESTART: [
-            MessageHandler(filters.TEXT & ~filters.COMMAND, edit_time_start_lesson)
+            MessageHandler(
+                filters.TEXT & ~filters.COMMAND,
+                lecturer_required(edit_time_start_lesson),
+            )
         ],
         EditLesson.EDIT_NUM_OF_SEATS: [
-            MessageHandler(filters.TEXT & ~filters.COMMAND, edit_num_of_seats_lesson)
+            MessageHandler(
+                filters.TEXT & ~filters.COMMAND,
+                lecturer_required(edit_num_of_seats_lesson),
+            )
         ],
         EditLesson.EDIT_LESSON_LINK: [
-            MessageHandler(filters.TEXT & ~filters.COMMAND, edit_lesson_link)
+            MessageHandler(
+                filters.TEXT & ~filters.COMMAND, lecturer_required(edit_lesson_link)
+            )
         ],
     },
     fallbacks=[
         CallbackQueryHandler(
-            return_to_lessons, pattern=f"^{EditLesson.RETURN_PREV_CONV}$"
+            lecturer_required(return_to_lessons),
+            pattern=f"^{EditLesson.RETURN_PREV_CONV}$",
         )
     ],
     map_to_parent={StopState.STOPPING: SwitchState.CHOOSE_ACTION, END: END},
@@ -105,26 +122,26 @@ EDIT_LESSON_CONV_HANDLER_ADMIN = ConversationHandler(
 LIST_ALL_LESSONS_CONV_HANDLER = ConversationHandler(
     [
         CallbackQueryHandler(
-            start_show_lessons,
+            lecturer_required(start_show_lessons),
             pattern=f"^{SwitchState.START_SHOW_RESOURCES}$",
         )
     ],
     states={
         SwitchState.CHOOSE_ACTION: [
             CallbackQueryHandler(
-                all_group_lessons_button,
+                lecturer_required(all_group_lessons_button),
                 pattern="^" + CALLBACK_DATA_GROUP_LESSON_PREFIX + "\d+",
             ),
             CallbackQueryHandler(
-                all_individual_lessons_button,
+                lecturer_required(all_individual_lessons_button),
                 pattern="^" + CALLBACK_DATA_INDIVIDUAL_LESSON_PREFIX + "\d+",
             ),
             CallbackQueryHandler(
-                show_all_group_lessons,
+                lecturer_required(show_all_group_lessons),
                 pattern=f"^{CALLBACK_DATA_GROUP_LESSON}$",
             ),
             CallbackQueryHandler(
-                show_all_individual_lessons,
+                lecturer_required(show_all_individual_lessons),
                 pattern=f"^{CALLBACK_DATA_INDIVIDUAL_LESSON}$",
             ),
             EDIT_LESSON_CONV_HANDLER_ADMIN,
@@ -133,7 +150,8 @@ LIST_ALL_LESSONS_CONV_HANDLER = ConversationHandler(
     },
     fallbacks=[
         CallbackQueryHandler(
-            return_to_lecturer, pattern=f"^{SwitchState.RETURN_PREV_CONV}$"
+            lecturer_required(return_to_lecturer),
+            pattern=f"^{SwitchState.RETURN_PREV_CONV}$",
         )
     ],
     map_to_parent={StopState.STOPPING: LecturerState.CHOOSE_ACTION, END: END},
@@ -143,42 +161,42 @@ LIST_ALL_LESSONS_CONV_HANDLER = ConversationHandler(
 UPDATE_LESSONS_CONV_HANDLER = ConversationHandler(
     entry_points=[
         CallbackQueryHandler(
-            start_inserting_lessons,
+            lecturer_required(start_inserting_lessons),
             pattern=f"^{UploadLessonsState.START_UPDATING_LESSONS}$",
         )
     ],
     states={
         UploadLessonsState.UPDATING_LESSONS: [
             CallbackQueryHandler(
-                start_inserting_group_lessons,
+                lecturer_required(start_inserting_group_lessons),
                 pattern=f"^{CALLBACK_DATA_GROUP_LESSON}$",
             ),
             CallbackQueryHandler(
-                start_inserting_individual_lessons,
+                lecturer_required(start_inserting_individual_lessons),
                 pattern=f"^{CALLBACK_DATA_INDIVIDUAL_LESSON}$",
             ),
         ],
         UploadLessonsState.INSERT_INDIVIDUAL_LESSONS: [
             MessageHandler(
                 filters.Document.MimeType("text/csv"),
-                insert_individual_lessons_handler,
+                lecturer_required(insert_individual_lessons_handler),
             ),
         ],
         UploadLessonsState.INSERT_GROUP_LESSONS: [
             MessageHandler(
                 filters.Document.MimeType("text/csv"),
-                insert_group_lessons_handler,
+                lecturer_required(insert_group_lessons_handler),
             ),
         ],
     },
     fallbacks=[
         CommandHandler("stop", stop),
         CallbackQueryHandler(
-            return_to_lecturer,
+            lecturer_required(return_to_lecturer),
             pattern=f"^{UploadLessonsState.RETURN_PREV_CONV}$",
         ),
         CallbackQueryHandler(
-            start_inserting_lessons,
+            lecturer_required(start_inserting_lessons),
             pattern=f"^{UploadLessonsState.RETURN_BACK}$",
         ),
     ],
@@ -195,7 +213,9 @@ LECTURER_CHOOSE_ACTION_HANDLERS = [
 
 LECTURER_CONV_HANDLER = ConversationHandler(
     entry_points=[
-        CommandHandler(command=["lecturer"], callback=lecturer_command),
+        CommandHandler(
+            command=["lecturer"], callback=lecturer_required(lecturer_command)
+        ),
     ],
     states={
         LecturerState.CHOOSE_ACTION: LECTURER_CHOOSE_ACTION_HANDLERS,
@@ -203,5 +223,6 @@ LECTURER_CONV_HANDLER = ConversationHandler(
     fallbacks=[
         CommandHandler("stop", stop),
         CallbackQueryHandler(stop, pattern=f"^{END}$"),
+        MessageHandler(filters.TEXT & filters.COMMAND, alert_user_lecturer),
     ],
 )

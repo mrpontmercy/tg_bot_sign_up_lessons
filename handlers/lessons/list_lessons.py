@@ -22,7 +22,7 @@ from services.kb import (
     get_type_lesson_keyboard,
 )
 from services.lesson import lessons_button, get_all_lessons_by_type_from_db
-from services.states import InterimAdminState, StopState, SwitchState
+from services.states import StopState, SwitchState
 from services.utils import Lesson
 
 

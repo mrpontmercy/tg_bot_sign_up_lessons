@@ -5,7 +5,7 @@ from sqlite3 import Error
 from telegram import Document
 from telegram.ext import ContextTypes
 
-from config import LECTURER_STATUS
+from config import ADMIN_STATUS, LECTURER_STATUS
 from db import get_db
 from services.db import get_user_by_phone_number, insert_lesson_in_db
 from services.exceptions import UserError
@@ -52,17 +52,34 @@ async def process_insert_lesson_into_db(
     recieved_file: Document,
     user_tg_id: int,
     is_group: bool,
+    user_status: str,
     context: ContextTypes.DEFAULT_TYPE,
+    lecturer_phone: str = None,
 ):
     file_path = await get_saved_lessonfile_path(recieved_file, context)
 
-    lessons = get_lessons_from_file(file_path)
+    if user_status == ADMIN_STATUS:
+        fieldnames = (
+            "title",
+            "time_start",
+            "num_of_seats",
+            "lecturer_phone",
+            "lesson_link",
+            "is_group",
+        )
+    elif user_status == LECTURER_STATUS:
+        fieldnames = ("title", "time_start", "num_of_seats", "lesson_link", "is_group")
+    lessons = get_lessons_from_file(file_path, fieldnames)
     os.remove(file_path)
     if lessons is None or not lessons:
         return (
             False,
             "Неверно заполнен файл. Возможно файл пустой. Попробуй с другим файлом.",
         )
+    if lessons[0].lecturer_phone is None:
+        for lesson in lessons:
+            lesson.lecturer_phone = lecturer_phone
+
     errors_after_inserting_lessons = await insert_lessons_if_possible_db(
         lessons, is_group
     )

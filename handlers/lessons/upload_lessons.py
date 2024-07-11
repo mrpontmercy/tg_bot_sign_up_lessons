@@ -6,6 +6,8 @@ from telegram.ext import (
 
 from handlers.response import send_error_message
 from services.admin.upload_lessons import process_insert_lesson_into_db
+from services.db import get_user_by_id, get_user_by_tg_id
+from services.decorators import define_user_status
 from services.kb import (
     get_back_keyboard,
     get_type_lesson_keyboard,
@@ -58,14 +60,22 @@ async def start_inserting_individual_lessons(
     return UploadLessonsState.INSERT_INDIVIDUAL_LESSONS
 
 
+@define_user_status
 async def insert_group_lessons_handler(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ):
     rec_document = update.message.document
     user_tg_id = update.effective_user.id
+    user_status = context.user_data.get("user_status")
+    user = await get_user_by_tg_id(user_tg_id)
     await delete_last_message_from_context(context)
     err, answer = await process_insert_lesson_into_db(
-        rec_document, user_tg_id, is_group=True, context=context
+        rec_document,
+        user_tg_id,
+        is_group=True,
+        user_status=user_status,
+        context=context,
+        lecturer_phone=user.phone_number,
     )
     if not err:
         back_kb = get_back_keyboard(UploadLessonsState.RETURN_BACK)
@@ -82,14 +92,22 @@ async def insert_group_lessons_handler(
     return UploadLessonsState.UPDATING_LESSONS
 
 
+@define_user_status
 async def insert_individual_lessons_handler(
     update: Update, context: ContextTypes.DEFAULT_TYPE
 ):
     rec_document = update.message.document
     user_tg_id = update.effective_user.id
+    user = await get_user_by_tg_id(user_tg_id)
+    user_status = context.user_data.get("user_status")
     await delete_last_message_from_context(context)
     err, answer = await process_insert_lesson_into_db(
-        rec_document, user_tg_id, is_group=False, context=context
+        rec_document,
+        user_tg_id,
+        is_group=False,
+        context=context,
+        user_status=user_status,
+        lecturer_phone=user.phone_number,
     )
     if not err:
         back_kb = get_back_keyboard(UploadLessonsState.RETURN_BACK)

@@ -32,3 +32,12 @@ async def return_to_lecturer(update: Update, context: ContextTypes.DEFAULT_TYPE)
     # await delete_last_message_from_context(context)
     await lecturer_command(update, context)
     return StopState.STOPPING
+
+
+async def alert_user_lecturer(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    kb = get_lecturer_keyboard()
+    await update.effective_message.reply_text(
+        "Сообщение не распознано. Выберите действие, либо введите /stop чтобы завершить беседу!",
+        reply_markup=kb,
+    )
+    return LecturerState.CHOOSE_ACTION

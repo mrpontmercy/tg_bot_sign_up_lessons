@@ -309,6 +309,6 @@ ADMIN_CONV_HANDLER = ConversationHandler(
         CallbackQueryHandler(
             admin_command, pattern=f"^{InterimAdminState.BACK_TO_ADMIN}$"
         ),
-        MessageHandler(filters.TEXT, alert_user_admin),
+        MessageHandler(filters.TEXT & filters.COMMAND, alert_user_admin),
     ],
 )
